@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/algol_sfa"
+    tools:context="com.algol.project.algolsfa.LoginActivity">
+
+    <ImageView
+        android:id="@+id/iv_more"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_margin="10dp"
+        android:src="@drawable/more" />
+
+    <ImageView
+        android:id="@+id/iv_logo"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"
+        android:src="@drawable/algol_sfa_logo" />
+
+    <EditText
+        android:id="@+id/et_username"
+        android:layout_width="230dp"
+        android:layout_height="50dp"
+        android:layout_below="@id/iv_logo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:drawableLeft="@drawable/user"
+        android:gravity="center"
+        android:hint="username"
+        android:inputType="text"
+        android:singleLine="true"
+        android:textColor="#fff"
+        android:textColorHint="#EDEDED"
+        android:textSize="14sp" />
+
+    <RelativeLayout
+        android:id="@+id/layout_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/et_username"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp">
+
+        <EditText
+            android:id="@+id/et_password"
+            android:layout_width="230dp"
+            android:layout_height="50dp"
+            android:layout_centerInParent="true"
+            android:drawableLeft="@drawable/password"
+            android:gravity="center"
+            android:hint="password"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:textColor="#fff"
+            android:textColorHint="#EDEDED"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/iv_password_visibility"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@id/et_password"
+            android:src="@drawable/show_password"
+            android:clickable="false"
+            android:alpha= "0.25"/>
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/btn_login"
+        android:layout_width="150dp"
+        android:layout_height="40dp"
+        android:layout_below="@id/layout_password"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/round_border_transparent_button"
+        android:text="Login"
+        android:textColor="#fff"
+        android:textStyle="bold"
+        android:alpha=".25"
+        android:clickable="false"/>
+
+    <Button
+        android:id="@+id/btn_forgot_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_login"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/transparent"
+        android:text="Forgot password?"
+        android:textAllCaps="false"
+        android:textColor="#fff"
+        android:textSize="11sp" />
+
+    <TextView
+        android:id="@+id/tv_powered_by"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Powered by Algol"
+        android:textSize="10sp"
+        android:layout_marginBottom="8dp"/>
+</RelativeLayout>

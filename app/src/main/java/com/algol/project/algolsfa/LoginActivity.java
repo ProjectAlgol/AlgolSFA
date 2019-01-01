@@ -2,7 +2,6 @@ package com.algol.project.algolsfa;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +13,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.algol.project.algolsfa.helper.AppUtility;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
     private EditText etUsername, etPassword;
@@ -127,7 +128,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void login() {
-        Toast.makeText(context, "Logging in...", Toast.LENGTH_SHORT).show();
+        requestLocationPermission();
     }
 
     private void togglePasswordVisibility() {
@@ -157,8 +158,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void openMoreOptionDialog() {
-        Dialog moreOptionDialog= new Dialog(context);
+        Dialog moreOptionDialog = new Dialog(context);
         moreOptionDialog.setContentView(R.layout.dialog_more_options);
         moreOptionDialog.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AppUtility(context).minimizeApp();
+    }
+
+    private void requestLocationPermission() {
     }
 }

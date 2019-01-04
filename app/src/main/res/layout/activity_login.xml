@@ -68,7 +68,6 @@
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@id/et_password"
             android:src="@drawable/show_password"
-            android:clickable="false"
             android:alpha= "0.25"/>
     </RelativeLayout>
 
@@ -83,8 +82,7 @@
         android:text="Login"
         android:textColor="#fff"
         android:textStyle="bold"
-        android:alpha=".25"
-        android:clickable="false"/>
+        android:alpha=".25" />
 
     <Button
         android:id="@+id/btn_forgot_password"

@@ -30,7 +30,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private Button btnLogin, btnForgotPassword;
     private SharedPreferences sharedPreferences;
     private Context context;
-    private ProgressBar loginProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,10 +49,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         btnForgotPassword.setOnClickListener(this);
         isPasswordVisible = false;
         context = LoginActivity.this;
-
-        loginProgressBar= new ProgressBar(context);
-        loginProgressBar.setIndeterminate(true);
-        loginProgressBar.
 
 
         etPassword.addTextChangedListener(new TextWatcher() {

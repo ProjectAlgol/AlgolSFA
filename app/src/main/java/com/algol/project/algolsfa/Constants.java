@@ -10,4 +10,5 @@ public class Constants {
 
     // permission codes
     public static final int REQUEST_LOGIN_PERMISSION= 1; // Permissions: Location, External drive read and write
+    public static final int REQUEST_CAMERA_PERMISSION= 2; // Permissions: Image Capture, Bar code and QR code scan
 }

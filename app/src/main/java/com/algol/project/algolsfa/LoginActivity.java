@@ -1,7 +1,6 @@
 package com.algol.project.algolsfa;
 
 import android.Manifest;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -9,36 +8,63 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.algol.project.algolsfa.helper.AppUtility;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
     private EditText etUsername, etPassword;
-    private ImageView ivMore, ivPasswordVisibility;
+    private ImageView ivPasswordVisibility;
     private boolean isPasswordVisible;
     private Button btnLogin, btnForgotPassword;
     private SharedPreferences sharedPreferences;
     private Context context;
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.login_menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.item_settings:
+                showSettingsDialog();
+                return true;
+            case R.id.item_about:
+                showAboutTheAppDialog();
+                return true;
+            case R.id.item_help:
+                return super.onOptionsItemSelected(item);
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        Toolbar tbLogin= findViewById(R.id.tb_login);
+        setSupportActionBar(tbLogin);
+        ActionBar loginActionBar= getSupportActionBar();
+        loginActionBar.setDisplayShowTitleEnabled(false);
         etUsername = findViewById(R.id.et_username);
         etPassword = findViewById(R.id.et_password);
-        ivMore = findViewById(R.id.iv_more);
-        ivMore.setOnClickListener(this);
         ivPasswordVisibility = findViewById(R.id.iv_password_visibility);
         ivPasswordVisibility.setOnClickListener(this);
         ivPasswordVisibility.setEnabled(false);
@@ -49,7 +75,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         btnForgotPassword.setOnClickListener(this);
         isPasswordVisible = false;
         context = LoginActivity.this;
-
 
         etPassword.addTextChangedListener(new TextWatcher() {
             @Override
@@ -127,10 +152,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 // show or hide password
                 togglePasswordVisibility();
                 break;
-            case R.id.iv_more:
-                // open more dialog
-                openMoreOptionDialog();
-                break;
             default:
                 break;
         }
@@ -178,10 +199,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    private void openMoreOptionDialog() {
-        Dialog moreOptionDialog = new Dialog(context);
-        moreOptionDialog.setContentView(R.layout.dialog_more_options);
-        moreOptionDialog.show();
+    private void showSettingsDialog() {
+        Toast.makeText(context,"Opening Settings Dialog",Toast.LENGTH_SHORT).show();
+    }
+
+    private void showAboutTheAppDialog() {
+        Toast.makeText(context,"Opening About the app Dialog",Toast.LENGTH_SHORT).show();
     }
 
     @Override

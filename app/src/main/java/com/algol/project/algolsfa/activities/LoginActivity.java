@@ -2,6 +2,7 @@ package com.algol.project.algolsfa.activities;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -9,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -26,6 +28,8 @@ import android.widget.Toast;
 import com.algol.project.algolsfa.others.Constants;
 import com.algol.project.algolsfa.R;
 import com.algol.project.algolsfa.helper.AppUtility;
+
+import java.util.ArrayList;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
     private EditText etUsername, etPassword;
@@ -207,6 +211,23 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void showAboutTheAppDialog() {
         Toast.makeText(context,"Opening About the app Dialog",Toast.LENGTH_SHORT).show();
+        AlertDialog.Builder builder= new AlertDialog.Builder(context,R.style.Theme_AppCompat_Dialog);
+        builder.setCancelable(true);
+        builder.setItems(aboutItems(),null);
+    }
+
+    private CharSequence[] aboutItems() {
+        ArrayList<String> items= new ArrayList<>();
+        String version= "Version : ";
+        try {
+            version += getPackageManager().getPackageInfo(getPackageName(),0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        items.add(version);
+        items.add("Developed by : " + getResources().getString(R.string.developer_name));
+        items.add("\u00A9 " + getResources().getString(R.string.copyright_year) + " " + getResources().getString(R.string.copyright_org));
+        return (CharSequence[]) items.toArray();
     }
 
     @Override

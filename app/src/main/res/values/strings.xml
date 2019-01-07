@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">AlgolSFA</string>
+    <string name="developer_name">Algol</string>
+    <string name="copyright_year">2018</string>
+    <string name="copyright_org">Algol</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
 </resources>

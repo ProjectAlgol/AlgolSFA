@@ -1,4 +1,4 @@
-package com.algol.project.algolsfa;
+package com.algol.project.algolsfa.activities;
 
 import android.Manifest;
 import android.content.Context;
@@ -23,6 +23,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.algol.project.algolsfa.others.Constants;
+import com.algol.project.algolsfa.R;
 import com.algol.project.algolsfa.helper.AppUtility;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {

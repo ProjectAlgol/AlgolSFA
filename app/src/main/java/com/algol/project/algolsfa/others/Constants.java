@@ -1,4 +1,6 @@
-package com.algol.project.algolsfa;
+package com.algol.project.algolsfa.others;
+
+import com.algol.project.algolsfa.BuildConfig;
 
 /**
  * Created by Lykos on 30-Dec-18.

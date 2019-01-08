@@ -2,7 +2,7 @@ package com.algol.project.algolsfa.activities;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -20,9 +20,12 @@ import android.text.method.PasswordTransformationMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.algol.project.algolsfa.others.Constants;
@@ -176,7 +179,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void processLogin() {
-        Toast.makeText(context,"Hang on... Logging you in",Toast.LENGTH_SHORT).show();
+        Intent homeIntent= new Intent(context,HomeActivity.class);
+        startActivity(homeIntent);
     }
 
     private void togglePasswordVisibility() {
@@ -206,14 +210,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void showSettingsDialog() {
-        Toast.makeText(context,"Opening Settings Dialog",Toast.LENGTH_SHORT).show();
+        // show settings dialog
     }
 
     private void showAboutTheAppDialog() {
-        Toast.makeText(context,"Opening About the app Dialog",Toast.LENGTH_SHORT).show();
         AlertDialog.Builder builder= new AlertDialog.Builder(context,R.style.Theme_AppCompat_Dialog);
         builder.setCancelable(true);
         builder.setItems(aboutItems(),null);
+        AlertDialog aboutDialog= builder.create();
+        aboutDialog.getListView().setEnabled(false);
+        Window dialogWindow= aboutDialog.getWindow();
+        LayoutParams dialogParams= dialogWindow.getAttributes();
+        dialogParams.alpha= 0.80f;
+        dialogWindow.setAttributes(dialogParams);
+        aboutDialog.show();
     }
 
     private CharSequence[] aboutItems() {
@@ -227,7 +237,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         items.add(version);
         items.add("Developed by : " + getResources().getString(R.string.developer_name));
         items.add("\u00A9 " + getResources().getString(R.string.copyright_year) + " " + getResources().getString(R.string.copyright_org));
-        return (CharSequence[]) items.toArray();
+        return items.toArray(new String[0]);
     }
 
     @Override

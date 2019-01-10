@@ -5,4 +5,6 @@
     <color name="colorAccent">#FF4081</color>
     <color name= "white">#FFFFFF</color>
     <color name= "dark_gray">#3D3D3D</color>
+    <color name= "matte_dark_black">#141414</color>
+    <color name= "matte_light_black">#1B1B1B</color>
 </resources>

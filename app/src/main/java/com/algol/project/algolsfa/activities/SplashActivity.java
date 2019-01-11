@@ -34,11 +34,14 @@ public class SplashActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences= context.getSharedPreferences(Constants.LOGIN_CRED_KEY,Context.MODE_PRIVATE);
         String password= sharedPreferences.getString(getResources().getString(R.string.password),"");
         if(password.length() > 0) {
-            // go to home activity
+            Intent homeIntent= new Intent(context,HomeActivity.class);
+            startActivity(homeIntent);
+            finish();
         }
         else {
             Intent loginIntent= new Intent(context,LoginActivity.class);
             startActivity(loginIntent);
+            finish();
         }
     }
 }

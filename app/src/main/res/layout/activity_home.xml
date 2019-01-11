@@ -3,6 +3,81 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include layout="@layout/common_toolbar" />
+    <include
+        android:id="@+id/home_toolbar"
+        layout="@layout/common_toolbar" />
 
+    <LinearLayout
+        android:id="@+id/horizontal_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/home_toolbar"
+        android:background="@color/matte_light_black"
+        android:orientation="horizontal"
+        android:paddingVertical="8dp">
+
+        <LinearLayout
+            android:id="@+id/order_visit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btn_order_visit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/transparent_button_background_with_border"
+                android:gravity="center"
+                android:paddingHorizontal="5dp"
+                android:text="Order &amp; Visit"
+                android:textStyle="bold"
+                android:typeface="monospace"
+                android:textColor="@color/white"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/delivery"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btn_delivery"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/float_transparent"
+                android:gravity="center"
+                android:text="Delivery"
+                android:textStyle="bold"
+                android:typeface="monospace"
+                android:textColor="@color/inactive_tab_color"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/reports"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btn_reports"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/float_transparent"
+                android:gravity="center"
+                android:text="Reports"
+                android:textStyle="bold"
+                android:typeface="monospace"
+                android:textColor="@color/inactive_tab_color"/>
+        </LinearLayout>
+    </LinearLayout>
+    <ListView
+        android:id="@+id/lv_dashboard_list"
+        android:layout_below="@id/horizontal_menu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </ListView>
 </RelativeLayout>

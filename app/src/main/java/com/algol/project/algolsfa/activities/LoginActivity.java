@@ -43,34 +43,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private Context context;
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.login_menu,menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.item_settings:
-                showSettingsDialog();
-                return true;
-            case R.id.item_about:
-                showAboutTheAppDialog();
-                return true;
-            case R.id.item_help:
-                return super.onOptionsItemSelected(item);
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        Toolbar tbLogin= findViewById(R.id.tb_login);
+        Toolbar tbLogin = findViewById(R.id.tb_login);
         setSupportActionBar(tbLogin);
-        ActionBar loginActionBar= getSupportActionBar();
+        ActionBar loginActionBar = getSupportActionBar();
         loginActionBar.setDisplayShowTitleEnabled(false);
         etUsername = findViewById(R.id.et_username);
         etPassword = findViewById(R.id.et_password);
@@ -138,6 +116,28 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         placeCredentials();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.login_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.item_settings:
+                showSettingsDialog();
+                return true;
+            case R.id.item_about:
+                showAboutTheAppDialog();
+                return true;
+            case R.id.item_help:
+                return super.onOptionsItemSelected(item);
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     private void placeCredentials() {
         /* place the username in the username text field if available */
         sharedPreferences = context.getSharedPreferences(Constants.LOGIN_CRED_KEY, Context.MODE_PRIVATE);
@@ -167,20 +167,27 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void login() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if(isPermissionRequired())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (isPermissionRequired())
                 requestLocationPermission();
             else
                 processLogin();
-        }
-        else {
+        } else {
             processLogin();
         }
     }
 
     private void processLogin() {
-        Intent homeIntent= new Intent(context,HomeActivity.class);
+        String username= etUsername.getText().toString();
+        String password= etPassword.getText().toString();
+        sharedPreferences= context.getSharedPreferences(Constants.LOGIN_CRED_KEY, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor= sharedPreferences.edit();
+        editor.putString(getResources().getString(R.string.username),username);
+        editor.putString(getResources().getString(R.string.password),password);
+        editor.apply();
+        Intent homeIntent = new Intent(context, HomeActivity.class);
         startActivity(homeIntent);
+        finish();
     }
 
     private void togglePasswordVisibility() {
@@ -214,23 +221,23 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void showAboutTheAppDialog() {
-        AlertDialog.Builder builder= new AlertDialog.Builder(context,R.style.Theme_AppCompat_Dialog);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.Theme_AppCompat_Dialog);
         builder.setCancelable(true);
-        builder.setItems(aboutItems(),null);
-        AlertDialog aboutDialog= builder.create();
+        builder.setItems(aboutItems(), null);
+        AlertDialog aboutDialog = builder.create();
         aboutDialog.getListView().setEnabled(false);
-        Window dialogWindow= aboutDialog.getWindow();
-        LayoutParams dialogParams= dialogWindow.getAttributes();
-        dialogParams.alpha= 0.80f;
+        Window dialogWindow = aboutDialog.getWindow();
+        LayoutParams dialogParams = dialogWindow.getAttributes();
+        dialogParams.alpha = 0.80f;
         dialogWindow.setAttributes(dialogParams);
         aboutDialog.show();
     }
 
     private CharSequence[] aboutItems() {
-        ArrayList<String> items= new ArrayList<>();
-        String version= "Version : ";
+        ArrayList<String> items = new ArrayList<>();
+        String version = "Version : ";
         try {
-            version += getPackageManager().getPackageInfo(getPackageName(),0).versionName;
+            version += getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
@@ -247,7 +254,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     private boolean isPermissionRequired() {
-        return (ContextCompat.checkSelfPermission(context,Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context,Manifest.permission.INTERNET) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context,Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context,Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED);
+        return (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -267,7 +274,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         break;
                     }
                 }
-                if(!isPermissionReceived)
+                if (!isPermissionReceived)
                     requestLocationPermission();
                 else
                     processLogin();

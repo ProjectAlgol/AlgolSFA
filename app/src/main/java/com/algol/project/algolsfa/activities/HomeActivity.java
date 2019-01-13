@@ -31,6 +31,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private Toolbar commonToolBar;
     private LinearLayout tabOrderAndVisit, tabDelivery, tabReports;
     private Button btnOrderAndVisit, btnDelivery, btnReports;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,17 +43,17 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setDisplayUseLogoEnabled(true);
         actionBar.setDisplayShowTitleEnabled(true);
-        tabOrderAndVisit= findViewById(R.id.order_visit);
+        tabOrderAndVisit = findViewById(R.id.order_visit);
         tabOrderAndVisit.setOnClickListener(this);
-        tabDelivery= findViewById(R.id.delivery);
+        tabDelivery = findViewById(R.id.delivery);
         tabDelivery.setOnClickListener(this);
-        tabReports= findViewById(R.id.reports);
+        tabReports = findViewById(R.id.reports);
         tabReports.setOnClickListener(this);
-        btnOrderAndVisit= findViewById(R.id.btn_order_visit);
+        btnOrderAndVisit = findViewById(R.id.btn_order_visit);
         btnOrderAndVisit.setOnClickListener(this);
-        btnDelivery= findViewById(R.id.btn_delivery);
+        btnDelivery = findViewById(R.id.btn_delivery);
         btnDelivery.setOnClickListener(this);
-        btnReports= findViewById(R.id.btn_reports);
+        btnReports = findViewById(R.id.btn_reports);
         btnReports.setOnClickListener(this);
     }
 
@@ -69,19 +70,40 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        String message= "";
-        switch(v.getId()) {
-            case R.id.order_visit: case R.id.btn_order_visit:
-                message= "Order and Visit";
+        String message = "";
+        switch (v.getId()) {
+            case R.id.order_visit:
+            case R.id.btn_order_visit:
+                message = "Order and Visit";
+                btnOrderAndVisit.setBackground(getResources().getDrawable(R.drawable.transparent_button_background_with_border));
+                btnOrderAndVisit.setTextColor(getResources().getColor(R.color.white));
+                btnDelivery.setBackgroundColor(getResources().getColor(R.color.float_transparent));
+                btnDelivery.setTextColor(getResources().getColor(R.color.inactive_tab_color));
+                btnReports.setBackgroundColor(getResources().getColor(R.color.float_transparent));
+                btnReports.setTextColor(getResources().getColor(R.color.inactive_tab_color));
                 break;
-            case R.id.delivery: case R.id.btn_delivery:
-                message= "Delivery";
+            case R.id.delivery:
+            case R.id.btn_delivery:
+                message = "Delivery";
+                btnOrderAndVisit.setBackgroundColor(getResources().getColor(R.color.float_transparent));
+                btnOrderAndVisit.setTextColor(getResources().getColor(R.color.inactive_tab_color));
+                btnDelivery.setBackground(getResources().getDrawable(R.drawable.transparent_button_background_with_border));
+                btnDelivery.setTextColor(getResources().getColor(R.color.white));
+                btnReports.setBackgroundColor(getResources().getColor(R.color.float_transparent));
+                btnReports.setTextColor(getResources().getColor(R.color.inactive_tab_color));
                 break;
-            case R.id.reports: case R.id.btn_reports:
-                message= "Reports";
+            case R.id.reports:
+            case R.id.btn_reports:
+                message = "Reports";
+                btnOrderAndVisit.setBackgroundColor(getResources().getColor(R.color.float_transparent));
+                btnOrderAndVisit.setTextColor(getResources().getColor(R.color.inactive_tab_color));
+                btnDelivery.setBackgroundColor(getResources().getColor(R.color.float_transparent));
+                btnDelivery.setTextColor(getResources().getColor(R.color.inactive_tab_color));
+                btnReports.setBackground(getResources().getDrawable(R.drawable.transparent_button_background_with_border));
+                btnReports.setTextColor(getResources().getColor(R.color.white));
                 break;
         }
-        Toast.makeText(context,message,Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -96,17 +118,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
     private void confirmLogout() {
         processLogout();
     }
 
     private void processLogout() {
         SharedPreferences sharedPreferences = context.getSharedPreferences(Constants.LOGIN_CRED_KEY, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor= sharedPreferences.edit();
-        editor.putString(getResources().getString(R.string.password),"");
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(getResources().getString(R.string.password), "");
         editor.apply();
-        Intent loginIntent= new Intent(context,LoginActivity.class);
+        Intent loginIntent = new Intent(context, LoginActivity.class);
         startActivity(loginIntent);
         finish();
     }

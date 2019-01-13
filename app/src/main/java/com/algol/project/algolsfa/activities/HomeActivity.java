@@ -70,11 +70,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        String message = "";
         switch (v.getId()) {
             case R.id.order_visit:
             case R.id.btn_order_visit:
-                message = "Order and Visit";
                 btnOrderAndVisit.setBackground(getResources().getDrawable(R.drawable.transparent_button_background_with_border));
                 btnOrderAndVisit.setTextColor(getResources().getColor(R.color.white));
                 btnDelivery.setBackgroundColor(getResources().getColor(R.color.float_transparent));
@@ -84,7 +82,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.delivery:
             case R.id.btn_delivery:
-                message = "Delivery";
                 btnOrderAndVisit.setBackgroundColor(getResources().getColor(R.color.float_transparent));
                 btnOrderAndVisit.setTextColor(getResources().getColor(R.color.inactive_tab_color));
                 btnDelivery.setBackground(getResources().getDrawable(R.drawable.transparent_button_background_with_border));
@@ -94,7 +91,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.reports:
             case R.id.btn_reports:
-                message = "Reports";
                 btnOrderAndVisit.setBackgroundColor(getResources().getColor(R.color.float_transparent));
                 btnOrderAndVisit.setTextColor(getResources().getColor(R.color.inactive_tab_color));
                 btnDelivery.setBackgroundColor(getResources().getColor(R.color.float_transparent));
@@ -103,7 +99,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 btnReports.setTextColor(getResources().getColor(R.color.white));
                 break;
         }
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -119,7 +114,22 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void confirmLogout() {
-        processLogout();
+        final SweetAlertDialog logoutDialog= new SweetAlertDialog(context,SweetAlertDialog.WARNING_TYPE);
+        logoutDialog.setContentText("Are you sure you wanna logout?");
+        logoutDialog.setCancelable(true);
+        logoutDialog.setConfirmButton("Yes", new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sweetAlertDialog) {
+                processLogout();
+            }
+        });
+        logoutDialog.setCancelButton("No", new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sweetAlertDialog) {
+                logoutDialog.dismiss();
+            }
+        });
+        logoutDialog.show();
     }
 
     private void processLogout() {

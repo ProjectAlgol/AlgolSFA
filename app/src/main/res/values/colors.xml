@@ -3,9 +3,11 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-    <color name= "white">#FFFFFF</color>
-    <color name= "dark_gray">#3D3D3D</color>
-    <color name= "matte_dark_black">#141414</color>
-    <color name= "matte_light_black">#1B1B1B</color>
-    <color name= "inactive_tab_color">#5B5B5B</color>
+    <color name="white">#FFFFFF</color>
+    <color name="dark_gray">#3D3D3D</color>
+    <color name="matte_dark_black">#141414</color>
+    <color name="matte_light_black">#1B1B1B</color>
+    <color name="inactive_tab_color">#5B5B5B</color>
+    <color name="confirm_button_background">#2E8B57</color>
+    <color name="cancel_button_background">#458B74</color>
 </resources>

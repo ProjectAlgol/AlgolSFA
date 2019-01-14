@@ -31,9 +31,9 @@
                 android:gravity="center"
                 android:paddingHorizontal="5dp"
                 android:text="Order &amp; Visit"
+                android:textColor="@color/white"
                 android:textStyle="bold"
-                android:typeface="monospace"
-                android:textColor="@color/white"/>
+                android:typeface="monospace" />
         </LinearLayout>
 
         <LinearLayout
@@ -50,9 +50,9 @@
                 android:background="@color/float_transparent"
                 android:gravity="center"
                 android:text="Delivery"
+                android:textColor="@color/inactive_tab_color"
                 android:textStyle="bold"
-                android:typeface="monospace"
-                android:textColor="@color/inactive_tab_color"/>
+                android:typeface="monospace" />
         </LinearLayout>
 
         <LinearLayout
@@ -69,15 +69,15 @@
                 android:background="@color/float_transparent"
                 android:gravity="center"
                 android:text="Reports"
+                android:textColor="@color/inactive_tab_color"
                 android:textStyle="bold"
-                android:typeface="monospace"
-                android:textColor="@color/inactive_tab_color"/>
+                android:typeface="monospace" />
         </LinearLayout>
     </LinearLayout>
+
     <ListView
         android:id="@+id/lv_dashboard_list"
-        android:layout_below="@id/horizontal_menu"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </ListView>
+        android:layout_height="match_parent"
+        android:layout_below="@id/horizontal_menu"></ListView>
 </RelativeLayout>

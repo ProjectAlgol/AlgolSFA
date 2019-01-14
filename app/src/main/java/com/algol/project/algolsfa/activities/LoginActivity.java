@@ -178,12 +178,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void processLogin() {
-        String username= etUsername.getText().toString();
-        String password= etPassword.getText().toString();
-        sharedPreferences= context.getSharedPreferences(Constants.LOGIN_CRED_KEY, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor= sharedPreferences.edit();
-        editor.putString(getResources().getString(R.string.username),username);
-        editor.putString(getResources().getString(R.string.password),password);
+        String username = etUsername.getText().toString();
+        String password = etPassword.getText().toString();
+        sharedPreferences = context.getSharedPreferences(Constants.LOGIN_CRED_KEY, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(getResources().getString(R.string.username), username);
+        editor.putString(getResources().getString(R.string.password), password);
         editor.apply();
         Intent homeIntent = new Intent(context, HomeActivity.class);
         startActivity(homeIntent);

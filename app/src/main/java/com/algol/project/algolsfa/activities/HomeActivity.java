@@ -1,12 +1,13 @@
 package com.algol.project.algolsfa.activities;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -114,33 +115,24 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void confirmLogout() {
-        final SweetAlertDialog logoutDialog= new SweetAlertDialog(context,SweetAlertDialog.WARNING_TYPE);
+        SweetAlertDialog logoutDialog = new SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE);
         logoutDialog.setContentText("Are you sure you wanna logout?");
         logoutDialog.setCancelable(true);
-        logoutDialog.setConfirmButton("Yes", new SweetAlertDialog.OnSweetClickListener() {
-            @Override
-            public void onClick(SweetAlertDialog sweetAlertDialog) {
-                processLogout();
-            }
-        });
-        logoutDialog.setCancelButton("No", new SweetAlertDialog.OnSweetClickListener() {
-            @Override
-            public void onClick(SweetAlertDialog sweetAlertDialog) {
-                logoutDialog.dismiss();
-            }
-        });
+        logoutDialog.setConfirmButton("Yes", this::processLogout);
+        logoutDialog.setCancelButton("No", SweetAlertDialog::dismissWithAnimation);
         logoutDialog.show();
+        logoutDialog.getButton(SweetAlertDialog.BUTTON_CONFIRM).setBackgroundResource(R.drawable.confirm_button_background);
+        logoutDialog.getButton(SweetAlertDialog.BUTTON_CANCEL).setBackgroundResource(R.drawable.cancel_button_background);
     }
 
-    private void processLogout() {
+    private void processLogout(SweetAlertDialog logoutAlert) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(Constants.LOGIN_CRED_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(getResources().getString(R.string.password), "");
         editor.apply();
         Intent loginIntent = new Intent(context, LoginActivity.class);
+        logoutAlert.dismissWithAnimation();
         startActivity(loginIntent);
         finish();
     }
-
-
 }

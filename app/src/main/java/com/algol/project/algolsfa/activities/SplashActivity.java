@@ -17,29 +17,24 @@ import com.algol.project.algolsfa.R;
 
 public class SplashActivity extends AppCompatActivity {
     private Context context;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        context= SplashActivity.this;
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                resumeApp();
-            }
-        },4000);
+        context = SplashActivity.this;
+        new Handler().postDelayed(this::resumeApp, 4000);
     }
 
     private void resumeApp() {
-        SharedPreferences sharedPreferences= context.getSharedPreferences(Constants.LOGIN_CRED_KEY,Context.MODE_PRIVATE);
-        String password= sharedPreferences.getString(getResources().getString(R.string.password),"");
-        if(password.length() > 0) {
-            Intent homeIntent= new Intent(context,HomeActivity.class);
+        SharedPreferences sharedPreferences = context.getSharedPreferences(Constants.LOGIN_CRED_KEY, Context.MODE_PRIVATE);
+        String password = sharedPreferences.getString(getResources().getString(R.string.password), "");
+        if (password.length() > 0) {
+            Intent homeIntent = new Intent(context, HomeActivity.class);
             startActivity(homeIntent);
             finish();
-        }
-        else {
-            Intent loginIntent= new Intent(context,LoginActivity.class);
+        } else {
+            Intent loginIntent = new Intent(context, LoginActivity.class);
             startActivity(loginIntent);
             finish();
         }

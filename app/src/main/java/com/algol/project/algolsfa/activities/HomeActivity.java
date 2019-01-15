@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +33,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private Toolbar commonToolBar;
     private LinearLayout tabOrderAndVisit, tabDelivery, tabReports;
     private Button btnOrderAndVisit, btnDelivery, btnReports;
+    private RecyclerView navList;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,11 +58,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         btnDelivery.setOnClickListener(this);
         btnReports = findViewById(R.id.btn_reports);
         btnReports.setOnClickListener(this);
+        navList= findViewById(R.id.rv_dashboard_list);
     }
 
     @Override
     public void onBackPressed() {
-        new AppUtility(context).minimizeApp();
+        AppUtility.minimizeApp(context);
     }
 
     @Override
@@ -80,6 +83,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 btnDelivery.setTextColor(getResources().getColor(R.color.inactive_tab_color));
                 btnReports.setBackgroundColor(getResources().getColor(R.color.float_transparent));
                 btnReports.setTextColor(getResources().getColor(R.color.inactive_tab_color));
+                showOrderAndVisitOptions();
                 break;
             case R.id.delivery:
             case R.id.btn_delivery:
@@ -89,6 +93,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 btnDelivery.setTextColor(getResources().getColor(R.color.white));
                 btnReports.setBackgroundColor(getResources().getColor(R.color.float_transparent));
                 btnReports.setTextColor(getResources().getColor(R.color.inactive_tab_color));
+                showDeliveryOptions();
                 break;
             case R.id.reports:
             case R.id.btn_reports:
@@ -98,6 +103,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 btnDelivery.setTextColor(getResources().getColor(R.color.inactive_tab_color));
                 btnReports.setBackground(getResources().getDrawable(R.drawable.transparent_button_background_with_border));
                 btnReports.setTextColor(getResources().getColor(R.color.white));
+                showReportOptions();
                 break;
         }
     }
@@ -113,10 +119,25 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void showOrderAndVisitOptions()
+    /*
+    * displays the list of Order & Visit options based on priviledge
+    * */
+    {
+
+    }
+
+    private void showDeliveryOptions() {
+
+    }
+
+    private void showReportOptions() {
+
+    }
 
     private void confirmLogout() {
         SweetAlertDialog logoutDialog = new SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE);
-        logoutDialog.setContentText("Are you sure you wanna logout?");
+        logoutDialog.setContentText(getResources().getString(R.string.logout_alert));
         logoutDialog.setCancelable(true);
         logoutDialog.setConfirmButton("Yes", this::processLogout);
         logoutDialog.setCancelButton("No", SweetAlertDialog::dismissWithAnimation);

@@ -27,6 +27,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void resumeApp() {
+        Constants.init(context);
         SharedPreferences sharedPreferences = context.getSharedPreferences(Constants.LOGIN_CRED_KEY, Context.MODE_PRIVATE);
         String password = sharedPreferences.getString(getResources().getString(R.string.password), "");
         if (password.length() > 0) {

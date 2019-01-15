@@ -5,4 +5,10 @@
     <string name="copyright_org">Algol</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
+    <string name="database_dir">AlgolSFA</string>
+    <string name="database_name">algolsfa.db</string>
+    <string name="database_version">1.0.0.0</string>
+
+    <!-- alert messages -->
+    <string name="logout_alert">Are you sure you wanna logout?</string>
 </resources>

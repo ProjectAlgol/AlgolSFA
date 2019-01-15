@@ -28,10 +28,12 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.algol.project.algolsfa.helper.SQLiteHelper;
 import com.algol.project.algolsfa.others.Constants;
 import com.algol.project.algolsfa.R;
 import com.algol.project.algolsfa.helper.AppUtility;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
@@ -41,6 +43,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private Button btnLogin, btnForgotPassword;
     private SharedPreferences sharedPreferences;
     private Context context;
+    private SQLiteHelper dbHelper;
+    private String username, password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +66,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         btnForgotPassword.setOnClickListener(this);
         isPasswordVisible = false;
         context = LoginActivity.this;
+        dbHelper = SQLiteHelper.getHelper(context);
 
         etPassword.addTextChangedListener(new TextWatcher() {
             @Override
@@ -152,7 +157,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         switch (v.getId()) {
             case R.id.btn_login:
                 // begin login process
-                login();
+                initiateLogin();
                 break;
             case R.id.btn_forgot_password:
                 // request for new password
@@ -166,7 +171,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    private void login() {
+    private void initiateLogin() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (isPermissionRequired())
                 requestLocationPermission();
@@ -177,9 +182,33 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    private void processLogin() {
-        String username = etUsername.getText().toString();
-        String password = etPassword.getText().toString();
+    private void processLogin()
+    /* * authenticates the user
+    * if device is online,
+        - it checks whether the db exists for the user. If it does, the privilege verification api is invoked.
+        - if it doesn't, the login api is invoked.
+      if device is offline,
+        - it checks whether the db exists for the user. If it does, a.
+        - if it doesn't, the authentication fails.
+    *
+    * */ {
+        this.username = etUsername.getText().toString();
+        this.password = etPassword.getText().toString();
+        if (AppUtility.isAppOnline(context)) {
+
+        } else {
+
+            if(dbHelper.isLocallyAuthentic(username, password)) {
+                login();
+            }
+            else {
+
+            }
+        }
+
+    }
+
+    private void login() {
         sharedPreferences = context.getSharedPreferences(Constants.LOGIN_CRED_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(getResources().getString(R.string.username), username);
@@ -249,17 +278,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onBackPressed() {
-        new AppUtility(context).minimizeApp();
+        AppUtility.minimizeApp(context);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     private boolean isPermissionRequired() {
-        return (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED);
+        return (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_NETWORK_STATE) == PackageManager.PERMISSION_DENIED);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void requestLocationPermission() {
-        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_LOGIN_PERMISSION);
+        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_NETWORK_STATE}, Constants.REQUEST_LOGIN_PERMISSION);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)

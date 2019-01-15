@@ -6,6 +6,8 @@ package com.algol.project.algolsfa.helper;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 /**
  * Created by Lykos on 01-Jan-19.
@@ -18,10 +20,16 @@ public class AppUtility {
         this.context = context;
     }
 
-    public void minimizeApp() {
+    public static void minimizeApp(Context context) {
         Intent intentMinimize = new Intent(Intent.ACTION_MAIN);
         intentMinimize.addCategory(Intent.CATEGORY_HOME);
         intentMinimize.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intentMinimize);
+    }
+
+    public static boolean isAppOnline(Context context) {
+        ConnectivityManager connectivityManager= (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo= connectivityManager.getActiveNetworkInfo();
+        return (networkInfo != null && networkInfo.isConnected());
     }
 }

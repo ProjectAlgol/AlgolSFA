@@ -75,9 +75,11 @@
         </LinearLayout>
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/lv_dashboard_list"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_dashboard_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/horizontal_menu"></ListView>
+        android:layout_below="@id/horizontal_menu">
+
+    </android.support.v7.widget.RecyclerView>
 </RelativeLayout>

@@ -12,6 +12,9 @@
     <!-- alert messages -->
     <string name="logout_alert">Are you sure you wanna logout?</string>
     <string name="login_alert_title">Failed to login</string>
-    <string name="login_alert_message">Turn on your internet and try to log in</string>
-    <string name="login_alert_invalid_credentials">Invalid Username or Password</string>
+    <string name="login_alert_go_online_and_try">Turn on your internet and try to log in</string>
+    <string name="login_alert_offline_signin">Signing in with offline mode</string>
+    <string name="login_alert_invalid_password">The password entered is invalid…</string>
+    <string name="login_alert_invalid_username">Invalid Username</string>
+    <string name="login_alert_invalid_db">The local database is either outdated or corrupted. Turn on the internet and get the latest DB</string>
 </resources>

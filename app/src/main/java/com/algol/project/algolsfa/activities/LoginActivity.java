@@ -1,6 +1,7 @@
 package com.algol.project.algolsfa.activities;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -48,6 +49,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private Context context;
     private SQLiteHelper dbHelper;
     private String username, password;
+
+    public static final int LOCALLY_AUTHENTIC = 0, LOCALLY_UNAUTHENTIC = 1, LOCALLY_ANONYMOUS = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -189,6 +192,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.O)
     @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     private void processLogin()
     /* * authenticates the user
@@ -203,50 +207,53 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     * */ {
         this.username = etUsername.getText().toString();
         this.password = etPassword.getText().toString();
-        if(new File(Constants.databaseAbsolutePath).exists()) {
+        if (new File(Constants.databaseAbsolutePath).exists()) {
             dbHelper = SQLiteHelper.getHelper(context);
-            if(dbHelper.isValidDB()){
-                if(dbHelper.isLocallyAuthentic(username, password)) {
+            if (dbHelper.isValidDB(AppUtility.getDeviceIMEI(context))) {
+                int localAuthenticationStatus= dbHelper.getLocalAuthenticationStatus(username, password);
+                if (localAuthenticationStatus == LOCALLY_AUTHENTIC) {
                     if (AppUtility.isAppOnline(context)) {
                         // verify privilege and login
                         login();
                     } else {
-                        login();
+                        // show offline sign in alert and login
+                        showLoginAlert(getResources().getString(R.string.login_alert_offline_signin));
                     }
                 }
-                else {
+                else if(localAuthenticationStatus == LOCALLY_UNAUTHENTIC) {
+                    showLoginAlert(getResources().getString(R.string.login_alert_invalid_password));
+                }
+                else if(localAuthenticationStatus == LOCALLY_ANONYMOUS) {
                     if (AppUtility.isAppOnline(context)) {
-                        showLoginAlert(getResources().getString(R.string.login_alert_invalid_credentials));
+                        // logging in with different user. Invoke Login API
                     } else {
-                        showLoginAlert(getResources().getString(R.string.login_alert_message));
+                        showLoginAlert(getResources().getString(R.string.login_alert_invalid_username));
                     }
                 }
-            }
-            else {
+            } else {
                 if (AppUtility.isAppOnline(context)) {
-                    // invoke login and download db
+                    // download latest db
                 } else {
-                    showLoginAlert(getResources().getString(R.string.login_alert_message));
+                    showLoginAlert(getResources().getString(R.string.login_alert_invalid_db));
                 }
             }
-        }
-        else {
+        } else {
             if (AppUtility.isAppOnline(context)) {
                 // invoke login and download db
             } else {
-                showLoginAlert(getResources().getString(R.string.login_alert_message));
+                showLoginAlert(getResources().getString(R.string.login_alert_go_online_and_try));
             }
         }
     }
 
     private void showLoginAlert(String content) {
-        SweetAlertDialog loginAlert= new SweetAlertDialog(context,SweetAlertDialog.WARNING_TYPE);
+        SweetAlertDialog loginAlert = new SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE);
         loginAlert.setCancelable(false);
         loginAlert.setContentText(content);
-        loginAlert.setConfirmButton("Ok",SweetAlertDialog::dismissWithAnimation);
+        loginAlert.setConfirmButton("Ok", SweetAlertDialog::dismissWithAnimation);
         loginAlert.showCancelButton(false);
         loginAlert.show();
-        Button neutralButton= loginAlert.getButton(SweetAlertDialog.BUTTON_CONFIRM);
+        Button neutralButton = loginAlert.getButton(SweetAlertDialog.BUTTON_CONFIRM);
         neutralButton.setBackgroundResource(R.drawable.neutral_button_background);
     }
 
@@ -327,12 +334,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     private boolean isPermissionRequired() {
-        return (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_NETWORK_STATE) == PackageManager.PERMISSION_DENIED);
+        return (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_NETWORK_STATE) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context,Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_DENIED);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void requestLocationPermission() {
-        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_NETWORK_STATE}, Constants.REQUEST_LOGIN_PERMISSION);
+        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.READ_PHONE_STATE}, Constants.REQUEST_LOGIN_PERMISSION);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)

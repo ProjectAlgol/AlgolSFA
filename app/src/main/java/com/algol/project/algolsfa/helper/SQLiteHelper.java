@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.algol.project.algolsfa.activities.LoginActivity;
 import com.algol.project.algolsfa.others.Constants;
 import com.algol.project.algolsfa.others.Constants.DBRelation;
 
@@ -42,30 +43,34 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     }
 
-    public boolean isLocallyAuthentic(String username, String password)
+    public int getLocalAuthenticationStatus(String username, String password)
     /*
     * authenticate the user locally using username and password present in the local database
     * */
     {
         SQLiteDatabase db= getReadableDatabase();
-        String query= "Select UserId, Password, DBCreationDateTime from " + DBRelation.SmanMaster;
+        String query= "Select Password, DBCreationDateTime from " + DBRelation.SmanMaster + " where UserId= ?";
         try {
-            Cursor resultSet= db.rawQuery(query,null);
+            Cursor resultSet= db.rawQuery(query,new String[]{username});
             if(resultSet.getCount() > 0) {
                 resultSet.moveToFirst();
-                return (resultSet.getString(resultSet.getColumnIndex("UserId")).equalsIgnoreCase(username) && resultSet.getString(resultSet.getColumnIndex("Password")).equalsIgnoreCase(password));
+                if(resultSet.getString(resultSet.getColumnIndex("Password")).equalsIgnoreCase(password))
+                    return LoginActivity.LOCALLY_AUTHENTIC;
+                else
+                    return LoginActivity.LOCALLY_UNAUTHENTIC;
+
             }
             else {
-                return false;
+                return LoginActivity.LOCALLY_ANONYMOUS;
             }
         }
         catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return LoginActivity.LOCALLY_ANONYMOUS;
         }
     }
 
-    public boolean isValidDB()
+    public boolean isValidDB(String deviceIMEI)
     /*
     * checks whether the database is valid based on the DB Status and Db Validity
     * */
@@ -80,8 +85,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                     resultSet.moveToNext();
                     String dbValidityPeriod= resultSet.getString(resultSet.getColumnIndex("Value"));
                     resultSet.close();
-                    query= "select case when (((select datetime('now','localtime')) >= (select DBCreationDateTime from SmanMaster)) and ((select datetime('now','localtime')) <= (select datetime((select strftime('%Y-%m-%d 23:59:59',(select DBCreationDateTime from SmanMaster))),'+" + dbValidityPeriod + " day')))) then 'Valid' else 'Invalid' end as Status";
-                    resultSet= db.rawQuery(query,null);
+                    query= "select case when (((select datetime('now','localtime')) >= (select DBCreationDateTime from " + DBRelation.SmanMaster + ")) and ((select datetime('now','localtime')) <= (select datetime((select strftime('%Y-%m-%d 23:59:59',(select DBCreationDateTime from " + DBRelation.SmanMaster + "))),'+? day'))) and (select DeviceIMEI from " + DBRelation.SmanMaster + ") = ?) then 'Valid' else 'Invalid' end as Status";
+                    resultSet= db.rawQuery(query,new String[]{dbValidityPeriod,deviceIMEI});
                     if(resultSet.getCount() > 0) {
                         resultSet.moveToFirst();
                         return (resultSet.getString(resultSet.getColumnIndex("Status")).equalsIgnoreCase("Valid"));

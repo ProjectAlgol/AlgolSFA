@@ -10,4 +10,5 @@
     <color name="inactive_tab_color">#5B5B5B</color>
     <color name="confirm_button_background">#2E8B57</color>
     <color name="cancel_button_background">#458B74</color>
+    <color name="neutral_button_background">#808A87</color>
 </resources>

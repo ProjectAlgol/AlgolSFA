@@ -48,12 +48,51 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     * */
     {
         SQLiteDatabase db= getReadableDatabase();
-        String query= "Select UserId, Password from " + DBRelation.SmanMaster;
+        String query= "Select UserId, Password, DBCreationDateTime from " + DBRelation.SmanMaster;
         try {
             Cursor resultSet= db.rawQuery(query,null);
             if(resultSet.getCount() > 0) {
                 resultSet.moveToFirst();
                 return (resultSet.getString(resultSet.getColumnIndex("UserId")).equalsIgnoreCase(username) && resultSet.getString(resultSet.getColumnIndex("Password")).equalsIgnoreCase(password));
+            }
+            else {
+                return false;
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean isValidDB()
+    /*
+    * checks whether the database is valid based on the DB Status and Db Validity
+    * */
+    {
+        SQLiteDatabase db= getReadableDatabase();
+        String query= "select Module, Value from " + DBRelation.SettingsMaster + " where Module in ('DBStatus','DBValidity')";
+        try {
+            Cursor resultSet= db.rawQuery(query,null);
+            if(resultSet.getCount() > 0) {
+                resultSet.moveToFirst();
+                if(resultSet.getString(resultSet.getColumnIndex("Value")).equalsIgnoreCase("Yes")) {
+                    resultSet.moveToNext();
+                    String dbValidityPeriod= resultSet.getString(resultSet.getColumnIndex("Value"));
+                    resultSet.close();
+                    query= "select case when (((select datetime('now','localtime')) >= (select DBCreationDateTime from SmanMaster)) and ((select datetime('now','localtime')) <= (select datetime((select strftime('%Y-%m-%d 23:59:59',(select DBCreationDateTime from SmanMaster))),'+" + dbValidityPeriod + " day')))) then 'Valid' else 'Invalid' end as Status";
+                    resultSet= db.rawQuery(query,null);
+                    if(resultSet.getCount() > 0) {
+                        resultSet.moveToFirst();
+                        return (resultSet.getString(resultSet.getColumnIndex("Status")).equalsIgnoreCase("Valid"));
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                else {
+                    return false;
+                }
             }
             else {
                 return false;

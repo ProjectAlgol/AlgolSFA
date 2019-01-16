@@ -22,7 +22,7 @@ public class Constants {
 
     // database tables
     public enum DBRelation {
-        PrivilegeMaster("PrivilegeMaster"), SmanMaster("SmanMaster");
+        PrivilegeMaster("PrivilegeMaster"), SmanMaster("SmanMaster"), SettingsMaster("SettingsMaster");
         private String action;
         DBRelation(String action) {
             this.action= action;

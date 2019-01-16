@@ -33,8 +33,11 @@ import com.algol.project.algolsfa.others.Constants;
 import com.algol.project.algolsfa.R;
 import com.algol.project.algolsfa.helper.AppUtility;
 
+import java.io.File;
 import java.sql.Connection;
 import java.util.ArrayList;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
     private EditText etUsername, etPassword;
@@ -66,7 +69,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         btnForgotPassword.setOnClickListener(this);
         isPasswordVisible = false;
         context = LoginActivity.this;
-        dbHelper = SQLiteHelper.getHelper(context);
 
         etPassword.addTextChangedListener(new TextWatcher() {
             @Override
@@ -74,6 +76,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (etPassword.getText().toString().trim().length() > 0) {
@@ -85,6 +88,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
             @Override
             public void afterTextChanged(Editable s) {
                 toggleLoginButtonActivation();
@@ -102,6 +106,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
             @Override
             public void afterTextChanged(Editable s) {
                 toggleLoginButtonActivation();
@@ -152,6 +157,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -171,6 +177,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     private void initiateLogin() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (isPermissionRequired())
@@ -182,8 +189,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     private void processLogin()
     /* * authenticates the user
+       * It the database exists and it is for
     * if device is online,
         - it checks whether the db exists for the user. If it does, the privilege verification api is invoked.
         - if it doesn't, the login api is invoked.
@@ -194,20 +203,54 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     * */ {
         this.username = etUsername.getText().toString();
         this.password = etPassword.getText().toString();
-        if (AppUtility.isAppOnline(context)) {
-
-        } else {
-
-            if(dbHelper.isLocallyAuthentic(username, password)) {
-                login();
+        if(new File(Constants.databaseAbsolutePath).exists()) {
+            dbHelper = SQLiteHelper.getHelper(context);
+            if(dbHelper.isValidDB()){
+                if(dbHelper.isLocallyAuthentic(username, password)) {
+                    if (AppUtility.isAppOnline(context)) {
+                        // verify privilege and login
+                        login();
+                    } else {
+                        login();
+                    }
+                }
+                else {
+                    if (AppUtility.isAppOnline(context)) {
+                        showLoginAlert(getResources().getString(R.string.login_alert_invalid_credentials));
+                    } else {
+                        showLoginAlert(getResources().getString(R.string.login_alert_message));
+                    }
+                }
             }
             else {
-
+                if (AppUtility.isAppOnline(context)) {
+                    // invoke login and download db
+                } else {
+                    showLoginAlert(getResources().getString(R.string.login_alert_message));
+                }
             }
         }
-
+        else {
+            if (AppUtility.isAppOnline(context)) {
+                // invoke login and download db
+            } else {
+                showLoginAlert(getResources().getString(R.string.login_alert_message));
+            }
+        }
     }
 
+    private void showLoginAlert(String content) {
+        SweetAlertDialog loginAlert= new SweetAlertDialog(context,SweetAlertDialog.WARNING_TYPE);
+        loginAlert.setCancelable(false);
+        loginAlert.setContentText(content);
+        loginAlert.setConfirmButton("Ok",SweetAlertDialog::dismissWithAnimation);
+        loginAlert.showCancelButton(false);
+        loginAlert.show();
+        Button neutralButton= loginAlert.getButton(SweetAlertDialog.BUTTON_CONFIRM);
+        neutralButton.setBackgroundResource(R.drawable.neutral_button_background);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     private void login() {
         sharedPreferences = context.getSharedPreferences(Constants.LOGIN_CRED_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -233,6 +276,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     private void toggleLoginButtonActivation() {
         if (etUsername.getText().toString().trim().length() > 0 && etPassword.getText().toString().trim().length() > 0) {
             // enabling login

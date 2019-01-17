@@ -43,67 +43,64 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     }
 
-    public int getLocalAuthenticationStatus(String username, String password)
+    public int getLocalAuthenticationStatus(String username, String password, String deviceIMEI)
     /*
-    * authenticate the user locally using username and password present in the local database
-    * */
-    {
-        SQLiteDatabase db= getReadableDatabase();
-        String query= "Select Password, DBCreationDateTime from " + DBRelation.SmanMaster + " where UserId= ?";
+    * authenticate the user locally using username, password and IMEI present in the local database
+    * */ {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "Select Password, DeviceIMEI from " + DBRelation.SmanMaster + " where UserId= ?";
         try {
-            Cursor resultSet= db.rawQuery(query,new String[]{username});
-            if(resultSet.getCount() > 0) {
+            Cursor resultSet = db.rawQuery(query, new String[]{username});
+            if (resultSet.getCount() > 0) {
                 resultSet.moveToFirst();
-                if(resultSet.getString(resultSet.getColumnIndex("Password")).equalsIgnoreCase(password))
+                String dbPassword= resultSet.getString(resultSet.getColumnIndex("Password"));
+                String dbIMEI= resultSet.getString(resultSet.getColumnIndex("DeviceIMEI"));
+                resultSet.close();
+                if (dbPassword.equalsIgnoreCase(password) && dbIMEI.equalsIgnoreCase(deviceIMEI))
                     return LoginActivity.LOCALLY_AUTHENTIC;
+                else if(!dbIMEI.equalsIgnoreCase(deviceIMEI))
+                    return LoginActivity.LOCALLY_UNAUTHORIZED;
                 else
                     return LoginActivity.LOCALLY_UNAUTHENTIC;
 
-            }
-            else {
+            } else {
                 return LoginActivity.LOCALLY_ANONYMOUS;
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return LoginActivity.LOCALLY_ANONYMOUS;
         }
     }
 
-    public boolean isValidDB(String deviceIMEI)
+    public boolean isValidDB()
     /*
-    * checks whether the database is valid based on the DB Status and Db Validity
-    * */
-    {
-        SQLiteDatabase db= getReadableDatabase();
-        String query= "select Module, Value from " + DBRelation.SettingsMaster + " where Module in ('DBStatus','DBValidity')";
+    * checks whether the database is valid based on the DB Status, Db Validity
+    * */ {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "select Module, Value from " + DBRelation.SettingsMaster + " where Module in ('DBStatus','DBValidity')";
         try {
-            Cursor resultSet= db.rawQuery(query,null);
-            if(resultSet.getCount() > 0) {
+            Cursor resultSet = db.rawQuery(query, null);
+            if (resultSet.getCount() > 0) {
                 resultSet.moveToFirst();
-                if(resultSet.getString(resultSet.getColumnIndex("Value")).equalsIgnoreCase("Yes")) {
+                if (resultSet.getString(resultSet.getColumnIndex("Value")).equalsIgnoreCase("Yes")) {
                     resultSet.moveToNext();
-                    String dbValidityPeriod= resultSet.getString(resultSet.getColumnIndex("Value"));
+                    String dbValidityPeriod = resultSet.getString(resultSet.getColumnIndex("Value"));
                     resultSet.close();
-                    query= "select case when (((select datetime('now','localtime')) >= (select DBCreationDateTime from " + DBRelation.SmanMaster + ")) and ((select datetime('now','localtime')) <= (select datetime((select strftime('%Y-%m-%d 23:59:59',(select DBCreationDateTime from " + DBRelation.SmanMaster + "))),'+? day'))) and (select DeviceIMEI from " + DBRelation.SmanMaster + ") = ?) then 'Valid' else 'Invalid' end as Status";
-                    resultSet= db.rawQuery(query,new String[]{dbValidityPeriod,deviceIMEI});
-                    if(resultSet.getCount() > 0) {
+                    query = "select case when (((select datetime('now','localtime')) >= (select DBCreationDateTime from " + DBRelation.SmanMaster + ")) and ((select datetime('now','localtime')) <= (select datetime((select strftime('%Y-%m-%d 23:59:59',(select DBCreationDateTime from " + DBRelation.SmanMaster + "))),'+" + dbValidityPeriod + " day')))) then 'Valid' else 'Invalid' end as Status";
+                    resultSet = db.rawQuery(query,null);
+                    if (resultSet.getCount() > 0) {
                         resultSet.moveToFirst();
                         return (resultSet.getString(resultSet.getColumnIndex("Status")).equalsIgnoreCase("Valid"));
-                    }
-                    else {
+                    } else {
                         return false;
                     }
-                }
-                else {
+                } else {
                     return false;
                 }
-            }
-            else {
+            } else {
                 return false;
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }

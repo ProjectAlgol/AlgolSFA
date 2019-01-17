@@ -1,7 +1,6 @@
 package com.algol.project.algolsfa.activities;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,7 +25,6 @@ import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.algol.project.algolsfa.helper.SQLiteHelper;
@@ -35,7 +33,6 @@ import com.algol.project.algolsfa.R;
 import com.algol.project.algolsfa.helper.AppUtility;
 
 import java.io.File;
-import java.sql.Connection;
 import java.util.ArrayList;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -50,7 +47,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private SQLiteHelper dbHelper;
     private String username, password;
 
-    public static final int LOCALLY_AUTHENTIC = 0, LOCALLY_UNAUTHENTIC = 1, LOCALLY_ANONYMOUS = 2;
+    public static final int LOCALLY_AUTHENTIC = 0, LOCALLY_UNAUTHENTIC = 1, LOCALLY_UNAUTHORIZED = 2, LOCALLY_ANONYMOUS = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +76,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             }
 
-            @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (etPassword.getText().toString().trim().length() > 0) {
@@ -91,7 +87,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             }
 
-            @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
             @Override
             public void afterTextChanged(Editable s) {
                 toggleLoginButtonActivation();
@@ -109,7 +104,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             }
 
-            @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
             @Override
             public void afterTextChanged(Editable s) {
                 toggleLoginButtonActivation();
@@ -160,7 +154,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -180,7 +174,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void initiateLogin() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (isPermissionRequired())
@@ -192,72 +187,88 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
-    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void processLogin()
-    /* * authenticates the user
-       * It the database exists and it is for
-    * if device is online,
-        - it checks whether the db exists for the user. If it does, the privilege verification api is invoked.
-        - if it doesn't, the login api is invoked.
-      if device is offline,
-        - it checks whether the db exists for the user. If it does, a.
-        - if it doesn't, the authentication fails.
-    *
+    /* * checks the existence and validity of the db. And authenticates the user
+       * If the database exists and it is valid, it tries to authenticate the user locally.
+            - For locally authentic user, if the device is online, the privilege verification API is invoked and user gets logged in after successful DB download. If the device is offline, the user gets logged in offline mode.
+            - For locally unauthentic user, the login fails
+            - For user whose username doesn't match locally, a fresh login is performed (if the device is online) and for successful login the previous db gets overwritten
+       * If the existing DB is invalid, the user is subjected to a a fresh login (id the device is online) and latest DB is downloaded.
+       * If the DB doesn't exist in the first place and the device is online, the login API is invoked and upon successful login the DB is downloaded
     * */ {
         this.username = etUsername.getText().toString();
         this.password = etPassword.getText().toString();
         if (new File(Constants.databaseAbsolutePath).exists()) {
             dbHelper = SQLiteHelper.getHelper(context);
-            if (dbHelper.isValidDB(AppUtility.getDeviceIMEI(context))) {
-                int localAuthenticationStatus= dbHelper.getLocalAuthenticationStatus(username, password);
+            if (dbHelper.isValidDB()) {
+                int localAuthenticationStatus = dbHelper.getLocalAuthenticationStatus(username, password, AppUtility.getDeviceIMEI(context));
                 if (localAuthenticationStatus == LOCALLY_AUTHENTIC) {
                     if (AppUtility.isAppOnline(context)) {
                         // verify privilege and login
                         login();
                     } else {
-                        // show offline sign in alert and login
-                        showLoginAlert(getResources().getString(R.string.login_alert_offline_signin));
+                        // prompt offline sign in alert and login
+                        showLoginAlert(getResources().getString(R.string.login_alert_offline_signin), SweetAlertDialog.SUCCESS_TYPE);
                     }
-                }
-                else if(localAuthenticationStatus == LOCALLY_UNAUTHENTIC) {
-                    showLoginAlert(getResources().getString(R.string.login_alert_invalid_password));
-                }
-                else if(localAuthenticationStatus == LOCALLY_ANONYMOUS) {
+                } else if (localAuthenticationStatus == LOCALLY_UNAUTHENTIC) {
+                    showLoginAlert(getResources().getString(R.string.login_alert_invalid_password), SweetAlertDialog.ERROR_TYPE);
+                } else if (localAuthenticationStatus == LOCALLY_UNAUTHORIZED) {
+                    showLoginAlert(getResources().getString(R.string.login_alert_imei_mismatch), SweetAlertDialog.ERROR_TYPE);
+                } else if (localAuthenticationStatus == LOCALLY_ANONYMOUS) {
                     if (AppUtility.isAppOnline(context)) {
                         // logging in with different user. Invoke Login API
+                        Toast.makeText(context, "Trying to login with different user. Please wait...", Toast.LENGTH_SHORT).show();
                     } else {
-                        showLoginAlert(getResources().getString(R.string.login_alert_invalid_username));
+                        showLoginAlert(getResources().getString(R.string.login_alert_invalid_username), SweetAlertDialog.ERROR_TYPE);
                     }
                 }
             } else {
                 if (AppUtility.isAppOnline(context)) {
-                    // download latest db
+                    // prompt invalid DB and invoke login API
+                    showLoginAlert(getResources().getString(R.string.login_alert_invalid_db_online), SweetAlertDialog.WARNING_TYPE);
                 } else {
-                    showLoginAlert(getResources().getString(R.string.login_alert_invalid_db));
+                    showLoginAlert(getResources().getString(R.string.login_alert_invalid_db_offline), SweetAlertDialog.WARNING_TYPE);
                 }
             }
         } else {
             if (AppUtility.isAppOnline(context)) {
-                // invoke login and download db
+                Toast.makeText(context, "DB ain't available. Please wait while trying to log in...", Toast.LENGTH_SHORT).show();
             } else {
-                showLoginAlert(getResources().getString(R.string.login_alert_go_online_and_try));
+                showLoginAlert(getResources().getString(R.string.login_alert_go_online_and_try), SweetAlertDialog.WARNING_TYPE);
             }
         }
     }
 
-    private void showLoginAlert(String content) {
-        SweetAlertDialog loginAlert = new SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE);
+    private void showLoginAlert(String content, int alertType) {
+        SweetAlertDialog loginAlert = new SweetAlertDialog(context, alertType);
         loginAlert.setCancelable(false);
+        if (!AppUtility.isAppOnline(context))
+            loginAlert.setTitleText("Offline Login");
         loginAlert.setContentText(content);
-        loginAlert.setConfirmButton("Ok", SweetAlertDialog::dismissWithAnimation);
-        loginAlert.showCancelButton(false);
+        if (content.equalsIgnoreCase(getResources().getString(R.string.login_alert_invalid_db_online))) {
+            loginAlert.setConfirmButton("Yes", SweetAlertDialog::dismissWithAnimation);
+            loginAlert.setCancelButton("Not now", SweetAlertDialog::dismissWithAnimation);
+        } else {
+            loginAlert.setConfirmButton("Ok", sweetAlertDialog -> {
+                if (content.equalsIgnoreCase(getResources().getString(R.string.login_alert_offline_signin)))
+                    login();
+                else
+                    sweetAlertDialog.dismissWithAnimation();
+            });
+            loginAlert.showCancelButton(false);
+        }
         loginAlert.show();
-        Button neutralButton = loginAlert.getButton(SweetAlertDialog.BUTTON_CONFIRM);
-        neutralButton.setBackgroundResource(R.drawable.neutral_button_background);
+        if (content.equalsIgnoreCase(getResources().getString(R.string.login_alert_invalid_db_online))) {
+            loginAlert.getButton(SweetAlertDialog.BUTTON_CONFIRM).setBackgroundResource(R.drawable.confirm_button_background);
+            loginAlert.getButton(SweetAlertDialog.BUTTON_CANCEL).setBackgroundResource(R.drawable.cancel_button_background);
+        } else {
+            Button neutralButton = loginAlert.getButton(SweetAlertDialog.BUTTON_CONFIRM);
+            neutralButton.setBackgroundResource(R.drawable.neutral_button_background);
+        }
+
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     private void login() {
         sharedPreferences = context.getSharedPreferences(Constants.LOGIN_CRED_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -283,7 +294,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     private void toggleLoginButtonActivation() {
         if (etUsername.getText().toString().trim().length() > 0 && etPassword.getText().toString().trim().length() > 0) {
             // enabling login
@@ -332,9 +342,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         AppUtility.minimizeApp(context);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     private boolean isPermissionRequired() {
-        return (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_NETWORK_STATE) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context,Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_DENIED);
+        return (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_NETWORK_STATE) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_DENIED);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -342,7 +351,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.READ_PHONE_STATE}, Constants.REQUEST_LOGIN_PERMISSION);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         boolean isPermissionReceived = true;

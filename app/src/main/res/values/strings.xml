@@ -17,6 +17,6 @@
     <string name="login_alert_invalid_password">Authentication Failed: Invalid Password</string>
     <string name="login_alert_invalid_username">Authentication Failed: Invalid Username</string>
     <string name="login_alert_imei_mismatch">Authentication Failed: Unauthorized Access</string>
-    <string name="login_alert_invalid_db_offline">Authentication Failed: The local database is either outdated or corrupted. Turn on the internet and get the latest DB</string>
-    <string name="login_alert_invalid_db_online">Authentication Failed: The local database is either outdated or corrupted. Would you like to download the updated DB?</string>
+    <string name="login_alert_invalid_db_offline">Authentication Failed: The local database is either outdated or corrupted. Turn on the internet and get the latest database</string>
+    <string name="login_alert_invalid_db_online">Authentication Failed: The local database is either outdated or corrupted. Would you like to download the updated database?</string>
 </resources>

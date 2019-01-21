@@ -41,9 +41,9 @@ public class SplashActivity extends AppCompatActivity {
         if (sharedPreferences.getString(getResources().getString(R.string.password), "").length() > 0) {
             if (new File(Constants.databaseAbsolutePath).exists()) {
                 SQLiteHelper dbHelper = SQLiteHelper.getHelper(context);
-                if (dbHelper.isValidDB()) {
-                    int localAuthenticationStatus = dbHelper.getLocalAuthenticationStatus(sharedPreferences.getString(getResources().getString(R.string.username), ""), sharedPreferences.getString(getResources().getString(R.string.password), ""), AppUtility.getDeviceIMEI(context));
-                    if (localAuthenticationStatus == LoginActivity.LOCALLY_AUTHENTIC) {
+                int localAuthenticationStatus = dbHelper.getLocalAuthenticationStatus(sharedPreferences.getString(getResources().getString(R.string.username), ""), sharedPreferences.getString(getResources().getString(R.string.password), ""), AppUtility.getDeviceIMEI(context));
+                if (localAuthenticationStatus == LoginActivity.LOCALLY_AUTHENTIC) {
+                    if (dbHelper.isValidDB()) {
                         startActivity(homeIntent);
                     } else {
                         startActivity(loginIntent);

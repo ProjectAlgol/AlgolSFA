@@ -189,21 +189,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void processLogin()
-    /* * checks the existence and validity of the db. And authenticates the user
-       * If the database exists and it is valid, it tries to authenticate the user locally.
-            - For locally authentic user, if the device is online, the privilege verification API is invoked and user gets logged in after successful DB download. If the device is offline, the user gets logged in offline mode.
+    /* * checks the existence of the db and authenticates the user
+       * If the database exists, it tries to authenticate the user locally.
+            - For locally authentic user, if the DB is valid and the device is online, the privilege verification API is invoked and user gets logged in after successful DB download. If the device is offline, the user gets logged in offline mode. For an invalid DB, if the device is online, the user is asked to download the updated DB. If the device is offline, it simply prompts 'Invalid Database' message
             - For locally unauthentic user, the login fails
-            - For user whose username doesn't match locally, a fresh login is performed (if the device is online) and for successful login the previous db gets overwritten
-       * If the existing DB is invalid, the user is subjected to a a fresh login (id the device is online) and latest DB is downloaded.
+            - For user whose username doesn't match locally, a fresh login is performed (if the device is online) and for successful login the previous db gets overwritten.
        * If the DB doesn't exist in the first place and the device is online, the login API is invoked and upon successful login the DB is downloaded
     * */ {
         this.username = etUsername.getText().toString();
         this.password = etPassword.getText().toString();
         if (new File(Constants.databaseAbsolutePath).exists()) {
             dbHelper = SQLiteHelper.getHelper(context);
-            if (dbHelper.isValidDB()) {
-                int localAuthenticationStatus = dbHelper.getLocalAuthenticationStatus(username, password, AppUtility.getDeviceIMEI(context));
-                if (localAuthenticationStatus == LOCALLY_AUTHENTIC) {
+            int localAuthenticationStatus = dbHelper.getLocalAuthenticationStatus(username, password, AppUtility.getDeviceIMEI(context));
+            if (localAuthenticationStatus == LOCALLY_AUTHENTIC) {
+                if (dbHelper.isValidDB()) {
                     if (AppUtility.isAppOnline(context)) {
                         // verify privilege and login
                         login();
@@ -211,24 +210,24 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         // prompt offline sign in alert and login
                         showLoginAlert(getResources().getString(R.string.login_alert_offline_signin), SweetAlertDialog.SUCCESS_TYPE);
                     }
-                } else if (localAuthenticationStatus == LOCALLY_UNAUTHENTIC) {
-                    showLoginAlert(getResources().getString(R.string.login_alert_invalid_password), SweetAlertDialog.ERROR_TYPE);
-                } else if (localAuthenticationStatus == LOCALLY_UNAUTHORIZED) {
-                    showLoginAlert(getResources().getString(R.string.login_alert_imei_mismatch), SweetAlertDialog.ERROR_TYPE);
-                } else if (localAuthenticationStatus == LOCALLY_ANONYMOUS) {
+                } else {
                     if (AppUtility.isAppOnline(context)) {
-                        // logging in with different user. Invoke Login API
-                        Toast.makeText(context, "Trying to login with different user. Please wait...", Toast.LENGTH_SHORT).show();
+                        // prompt invalid DB and invoke login API
+                        showLoginAlert(getResources().getString(R.string.login_alert_invalid_db_online), SweetAlertDialog.WARNING_TYPE);
                     } else {
-                        showLoginAlert(getResources().getString(R.string.login_alert_invalid_username), SweetAlertDialog.ERROR_TYPE);
+                        showLoginAlert(getResources().getString(R.string.login_alert_invalid_db_offline), SweetAlertDialog.WARNING_TYPE);
                     }
                 }
-            } else {
+            } else if (localAuthenticationStatus == LOCALLY_UNAUTHENTIC) {
+                showLoginAlert(getResources().getString(R.string.login_alert_invalid_password), SweetAlertDialog.ERROR_TYPE);
+            } else if (localAuthenticationStatus == LOCALLY_UNAUTHORIZED) {
+                showLoginAlert(getResources().getString(R.string.login_alert_imei_mismatch), SweetAlertDialog.ERROR_TYPE);
+            } else if (localAuthenticationStatus == LOCALLY_ANONYMOUS) {
                 if (AppUtility.isAppOnline(context)) {
-                    // prompt invalid DB and invoke login API
-                    showLoginAlert(getResources().getString(R.string.login_alert_invalid_db_online), SweetAlertDialog.WARNING_TYPE);
+                    // logging in with different user. Invoke Login API
+                    Toast.makeText(context, "Trying to login with different user. Please wait...", Toast.LENGTH_SHORT).show();
                 } else {
-                    showLoginAlert(getResources().getString(R.string.login_alert_invalid_db_offline), SweetAlertDialog.WARNING_TYPE);
+                    showLoginAlert(getResources().getString(R.string.login_alert_invalid_username), SweetAlertDialog.ERROR_TYPE);
                 }
             }
         } else {

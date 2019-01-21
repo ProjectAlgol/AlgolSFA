@@ -225,14 +225,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             } else if (localAuthenticationStatus == LOCALLY_ANONYMOUS) {
                 if (AppUtility.isAppOnline(context)) {
                     // logging in with different user. Invoke Login API
-                    Toast.makeText(context, "Trying to login with different user. Please wait...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Hang on, Trying to login with different user...", Toast.LENGTH_SHORT).show();
                 } else {
                     showLoginAlert(getResources().getString(R.string.login_alert_invalid_username), SweetAlertDialog.ERROR_TYPE);
                 }
             }
         } else {
             if (AppUtility.isAppOnline(context)) {
-                Toast.makeText(context, "DB ain't available. Please wait while trying to log in...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Database ain't available. Hang on while trying to log in...", Toast.LENGTH_SHORT).show();
             } else {
                 showLoginAlert(getResources().getString(R.string.login_alert_go_online_and_try), SweetAlertDialog.WARNING_TYPE);
             }

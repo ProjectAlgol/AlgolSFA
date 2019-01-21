@@ -20,6 +20,18 @@ public class Constants {
     public static final int REQUEST_LOGIN_PERMISSION= 1; // Permissions: Location, External drive read and write
     public static final int REQUEST_CAMERA_PERMISSION= 2; // Permissions: Image Capture, Bar code and QR code scan
 
+    // privilege purposes
+    public enum UserPrivilege {
+        OrderAndVisit("Order and Visit"), Delivery("Delivery"), Reports("Reports");
+        private String action;
+        UserPrivilege(String action) {
+            this.action= action;
+        }
+        public String getAction() {
+            return action;
+        }
+    }
+
     // database tables
     public enum DBRelation {
         PrivilegeMaster("PrivilegeMaster"), SmanMaster("SmanMaster"), SettingsMaster("SettingsMaster");

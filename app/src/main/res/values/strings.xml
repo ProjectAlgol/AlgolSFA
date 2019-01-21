@@ -19,4 +19,7 @@
     <string name="login_alert_imei_mismatch">Authentication Failed: Unauthorized Access</string>
     <string name="login_alert_invalid_db_offline">Authentication Failed: The local database is either outdated or corrupted. Turn on the internet and get the latest database</string>
     <string name="login_alert_invalid_db_online">Authentication Failed: The local database is either outdated or corrupted. Would you like to download the updated database?</string>
+
+    <!-- vacant message -->
+    <string name="no_dashboard_list">No service is allocated to you</string>
 </resources>

@@ -17,7 +17,9 @@ import android.widget.LinearLayout;
 
 import com.algol.project.algolsfa.R;
 import com.algol.project.algolsfa.helper.AppUtility;
+import com.algol.project.algolsfa.helper.SQLiteHelper;
 import com.algol.project.algolsfa.others.Constants;
+import com.algol.project.algolsfa.others.Constants.UserPrivilege;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -31,31 +33,75 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private LinearLayout tabOrderAndVisit, tabDelivery, tabReports;
     private Button btnOrderAndVisit, btnDelivery, btnReports;
     private RecyclerView navList;
+    private SQLiteHelper dbHelper;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         context = HomeActivity.this;
+        dbHelper= SQLiteHelper.getHelper(context);
         commonToolBar = findViewById(R.id.tb_common);
         setSupportActionBar(commonToolBar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setDisplayUseLogoEnabled(true);
         actionBar.setDisplayShowTitleEnabled(true);
-        tabOrderAndVisit = findViewById(R.id.order_visit);
-        tabOrderAndVisit.setOnClickListener(this);
-        tabDelivery = findViewById(R.id.delivery);
-        tabDelivery.setOnClickListener(this);
-        tabReports = findViewById(R.id.reports);
-        tabReports.setOnClickListener(this);
         btnOrderAndVisit = findViewById(R.id.btn_order_visit);
-        btnOrderAndVisit.setOnClickListener(this);
         btnDelivery = findViewById(R.id.btn_delivery);
-        btnDelivery.setOnClickListener(this);
         btnReports = findViewById(R.id.btn_reports);
-        btnReports.setOnClickListener(this);
+        tabOrderAndVisit = findViewById(R.id.order_visit);
+        tabDelivery = findViewById(R.id.delivery);
+        tabReports = findViewById(R.id.reports);
         navList= findViewById(R.id.rv_dashboard_list);
+        int tabCount= 0;
+
+        if(dbHelper.isPrivileged(UserPrivilege.OrderAndVisit.getAction())) {
+            tabOrderAndVisit.setOnClickListener(this);
+            btnOrderAndVisit.setOnClickListener(this);
+            tabCount++;
+            showOrderAndVisitOptions();
+        }
+        else {
+            tabOrderAndVisit.setVisibility(View.GONE);
+        }
+
+        if(dbHelper.isPrivileged(UserPrivilege.Delivery.getAction())) {
+            tabDelivery.setOnClickListener(this);
+            btnDelivery.setOnClickListener(this);
+            tabCount++;
+            if(tabCount == 1) { // being the first tab
+                btnDelivery.setBackground(getResources().getDrawable(R.drawable.transparent_button_background_with_border));
+                btnDelivery.setTextColor(getResources().getColor(R.color.white));
+                showDeliveryOptions();
+            }
+        }
+        else {
+            tabDelivery.setVisibility(View.GONE);
+        }
+
+        if(dbHelper.isPrivileged(UserPrivilege.Reports.getAction())) {
+            tabReports.setOnClickListener(this);
+            btnReports.setOnClickListener(this);
+            tabCount++;
+            if(tabCount == 1) { // being the first tab
+                btnReports.setBackground(getResources().getDrawable(R.drawable.transparent_button_background_with_border));
+                btnReports.setTextColor(getResources().getColor(R.color.white));
+                showReportOptions();
+            }
+        }
+        else {
+            tabReports.setVisibility(View.GONE);
+        }
+
+        if(tabCount == 0) {
+            findViewById(R.id.horizontal_menu).setVisibility(View.GONE);
+            navList.setVisibility(View.GONE);
+            findViewById(R.id.tv_no_list).setVisibility(View.VISIBLE);
+        }
+        else if(tabCount == 1) {
+            findViewById(R.id.horizontal_menu).setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -118,7 +164,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private void showOrderAndVisitOptions()
     /*
-    * displays the list of Order & Visit options based on priviledge
+    * displays the list of Order & Visit options based on privilege
     * */
     {
 

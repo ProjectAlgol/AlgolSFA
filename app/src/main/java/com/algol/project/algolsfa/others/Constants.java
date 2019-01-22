@@ -22,7 +22,7 @@ public class Constants {
 
     // privilege purposes
     public enum UserPrivilege {
-        OrderAndVisit("Order and Visit"), Delivery("Delivery"), Reports("Reports");
+        OrderAndVisit("Order and Visit"), Delivery("Delivery"), Analytics("Analytics"), PlannedVisit("Planned Visit"), UnplannedVisit("Unplanned Visit"), NewOutletAddition("New Outlet Addition"), MultiSurvey("Multi Survey");
         private String action;
         UserPrivilege(String action) {
             this.action= action;

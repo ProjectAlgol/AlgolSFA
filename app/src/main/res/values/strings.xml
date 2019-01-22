@@ -22,4 +22,41 @@
 
     <!-- vacant message -->
     <string name="no_dashboard_list">No service is allocated to you</string>
+
+    <!-- dashboard item title -->
+    <string name="planned_visit">Planned Visit</string>
+    <string name="unplanned_visit">Unplanned Visit</string>
+    <string name="new_outlet_addition">New Outlet Addition</string>
+    <string name="multi_survey">Multi Survey</string>
+
+    <string name="order_delivery">Order Delivery</string>
+    <string name="my_transactions">My Transactions</string>
+    <string name="settlement">Settlement</string>
+    <string name="reload_stock">Reload Stock</string>
+
+    <string name="view_outlets">View Outlets</string>
+    <string name="my_team">My Team</string>
+    <string name="order_reports">Order Reports</string>
+    <string name="delivery_reports">Delivery Reports</string>
+    <string name="survey_reports">Survey Reports</string>
+
+    <string name="daily_summary">Today\'s Summary</string>
+
+    <!-- dashboard item description -->
+    <string name="planned_visit_desc">Visit planned customers, take orders</string>
+    <string name="unplanned_visit_desc">Visit unplanned customers and take orders</string>
+    <string name="new_outlet_addition_desc">Add customers in our social and business circle</string>
+    <string name="multi_survey_desc">Survey outlets for review and experience</string>
+    <string name="daily_summary_desc">View today\'s order summary</string>
+
+    <string name="order_delivery_desc">Deliver orders to the customers</string>
+    <string name="my_transactions_desc">View transaction summary</string>
+    <string name="settlement_desc">Settle stock and loads</string>
+    <string name="reload_stock_desc">Reload stock on the fly</string>
+
+    <string name="view_outlets_desc">Locate customers in the map</string>
+    <string name="my_team_desc">Locate and track team members</string>
+    <string name="order_reports_desc">View the Order Reports</string>
+    <string name="delivery_reports_desc">View the Delivery Reports</string>
+    <string name="survey_reports_desc">View the Survey Reports</string>
 </resources>

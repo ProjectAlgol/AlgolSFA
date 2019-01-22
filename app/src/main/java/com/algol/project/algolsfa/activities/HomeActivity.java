@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -14,12 +15,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.algol.project.algolsfa.R;
+import com.algol.project.algolsfa.adapters.DashboardItemAdapter;
 import com.algol.project.algolsfa.helper.AppUtility;
 import com.algol.project.algolsfa.helper.SQLiteHelper;
+import com.algol.project.algolsfa.models.DashboardItemModel;
 import com.algol.project.algolsfa.others.Constants;
 import com.algol.project.algolsfa.others.Constants.UserPrivilege;
+
+import java.util.ArrayList;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -30,17 +36,20 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener {
     private Context context;
     private Toolbar commonToolBar;
-    private LinearLayout tabOrderAndVisit, tabDelivery, tabReports;
-    private Button btnOrderAndVisit, btnDelivery, btnReports;
+    private LinearLayout tabOrderAndVisit, tabDelivery, tabAnalytics;
+    private Button btnOrderAndVisit, btnDelivery, btnAnalytics;
     private RecyclerView navList;
     private SQLiteHelper dbHelper;
+    private DashboardItemAdapter dashboardItemAdapter;
+    private ArrayList<DashboardItemModel> orderAndVisitList, deliveryList, analyticsList;
+    private TextView tvNoList;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         context = HomeActivity.this;
-        dbHelper= SQLiteHelper.getHelper(context);
+        dbHelper = SQLiteHelper.getHelper(context);
         commonToolBar = findViewById(R.id.tb_common);
         setSupportActionBar(commonToolBar);
         ActionBar actionBar = getSupportActionBar();
@@ -49,57 +58,59 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         actionBar.setDisplayShowTitleEnabled(true);
         btnOrderAndVisit = findViewById(R.id.btn_order_visit);
         btnDelivery = findViewById(R.id.btn_delivery);
-        btnReports = findViewById(R.id.btn_reports);
+        btnAnalytics = findViewById(R.id.btn_analytics);
         tabOrderAndVisit = findViewById(R.id.order_visit);
         tabDelivery = findViewById(R.id.delivery);
-        tabReports = findViewById(R.id.reports);
-        navList= findViewById(R.id.rv_dashboard_list);
-        int tabCount= 0;
+        tabAnalytics = findViewById(R.id.analytics);
+        navList = findViewById(R.id.rv_dashboard_list);
+        tvNoList = findViewById(R.id.tv_no_list);
+        navList.setHasFixedSize(true);
+        navList.setLayoutManager(new LinearLayoutManager(context));
+        orderAndVisitList = new ArrayList<>();
+        deliveryList = new ArrayList<>();
+        analyticsList = new ArrayList<>();
+        int tabCount = 0;
 
-        if(dbHelper.isPrivileged(UserPrivilege.OrderAndVisit.getAction())) {
+        if (dbHelper.isPrivileged(UserPrivilege.OrderAndVisit.getAction())) {
             tabOrderAndVisit.setOnClickListener(this);
             btnOrderAndVisit.setOnClickListener(this);
             tabCount++;
             showOrderAndVisitOptions();
-        }
-        else {
+        } else {
             tabOrderAndVisit.setVisibility(View.GONE);
         }
 
-        if(dbHelper.isPrivileged(UserPrivilege.Delivery.getAction())) {
+        if (dbHelper.isPrivileged(UserPrivilege.Delivery.getAction())) {
             tabDelivery.setOnClickListener(this);
             btnDelivery.setOnClickListener(this);
             tabCount++;
-            if(tabCount == 1) { // being the first tab
+            if (tabCount == 1) { // being the first tab
                 btnDelivery.setBackground(getResources().getDrawable(R.drawable.transparent_button_background_with_border));
                 btnDelivery.setTextColor(getResources().getColor(R.color.white));
                 showDeliveryOptions();
             }
-        }
-        else {
+        } else {
             tabDelivery.setVisibility(View.GONE);
         }
 
-        if(dbHelper.isPrivileged(UserPrivilege.Reports.getAction())) {
-            tabReports.setOnClickListener(this);
-            btnReports.setOnClickListener(this);
+        if (dbHelper.isPrivileged(UserPrivilege.Analytics.getAction())) {
+            tabAnalytics.setOnClickListener(this);
+            btnAnalytics.setOnClickListener(this);
             tabCount++;
-            if(tabCount == 1) { // being the first tab
-                btnReports.setBackground(getResources().getDrawable(R.drawable.transparent_button_background_with_border));
-                btnReports.setTextColor(getResources().getColor(R.color.white));
-                showReportOptions();
+            if (tabCount == 1) { // being the first tab
+                btnAnalytics.setBackground(getResources().getDrawable(R.drawable.transparent_button_background_with_border));
+                btnAnalytics.setTextColor(getResources().getColor(R.color.white));
+                showAnalyticsOptions();
             }
-        }
-        else {
-            tabReports.setVisibility(View.GONE);
+        } else {
+            tabAnalytics.setVisibility(View.GONE);
         }
 
-        if(tabCount == 0) {
+        if (tabCount == 0) {
             findViewById(R.id.horizontal_menu).setVisibility(View.GONE);
             navList.setVisibility(View.GONE);
-            findViewById(R.id.tv_no_list).setVisibility(View.VISIBLE);
-        }
-        else if(tabCount == 1) {
+            tvNoList.setVisibility(View.VISIBLE);
+        } else if (tabCount == 1) {
             findViewById(R.id.horizontal_menu).setVisibility(View.GONE);
         }
     }
@@ -124,8 +135,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 btnOrderAndVisit.setTextColor(getResources().getColor(R.color.white));
                 btnDelivery.setBackgroundColor(getResources().getColor(R.color.float_transparent));
                 btnDelivery.setTextColor(getResources().getColor(R.color.inactive_tab_color));
-                btnReports.setBackgroundColor(getResources().getColor(R.color.float_transparent));
-                btnReports.setTextColor(getResources().getColor(R.color.inactive_tab_color));
+                btnAnalytics.setBackgroundColor(getResources().getColor(R.color.float_transparent));
+                btnAnalytics.setTextColor(getResources().getColor(R.color.inactive_tab_color));
                 showOrderAndVisitOptions();
                 break;
             case R.id.delivery:
@@ -134,19 +145,19 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 btnOrderAndVisit.setTextColor(getResources().getColor(R.color.inactive_tab_color));
                 btnDelivery.setBackground(getResources().getDrawable(R.drawable.transparent_button_background_with_border));
                 btnDelivery.setTextColor(getResources().getColor(R.color.white));
-                btnReports.setBackgroundColor(getResources().getColor(R.color.float_transparent));
-                btnReports.setTextColor(getResources().getColor(R.color.inactive_tab_color));
+                btnAnalytics.setBackgroundColor(getResources().getColor(R.color.float_transparent));
+                btnAnalytics.setTextColor(getResources().getColor(R.color.inactive_tab_color));
                 showDeliveryOptions();
                 break;
-            case R.id.reports:
-            case R.id.btn_reports:
+            case R.id.analytics:
+            case R.id.btn_analytics:
                 btnOrderAndVisit.setBackgroundColor(getResources().getColor(R.color.float_transparent));
                 btnOrderAndVisit.setTextColor(getResources().getColor(R.color.inactive_tab_color));
                 btnDelivery.setBackgroundColor(getResources().getColor(R.color.float_transparent));
                 btnDelivery.setTextColor(getResources().getColor(R.color.inactive_tab_color));
-                btnReports.setBackground(getResources().getDrawable(R.drawable.transparent_button_background_with_border));
-                btnReports.setTextColor(getResources().getColor(R.color.white));
-                showReportOptions();
+                btnAnalytics.setBackground(getResources().getDrawable(R.drawable.transparent_button_background_with_border));
+                btnAnalytics.setTextColor(getResources().getColor(R.color.white));
+                showAnalyticsOptions();
                 break;
         }
     }
@@ -165,17 +176,155 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private void showOrderAndVisitOptions()
     /*
     * displays the list of Order & Visit options based on privilege
-    * */
-    {
-
+    * */ {
+        tvNoList.setVisibility(View.GONE);
+        navList.setVisibility(View.VISIBLE);
+        if (orderAndVisitList.size() == 0) {
+            orderAndVisitList = prepareDataList("Order and Visit");
+            if (orderAndVisitList.size() > 0) {
+                dashboardItemAdapter = new DashboardItemAdapter(context, orderAndVisitList);
+                navList.setAdapter(dashboardItemAdapter);
+            } else {
+                navList.setVisibility(View.GONE);
+                tvNoList.setVisibility(View.VISIBLE);
+            }
+        } else {
+            dashboardItemAdapter = new DashboardItemAdapter(context, orderAndVisitList);
+            navList.setAdapter(dashboardItemAdapter);
+        }
     }
 
     private void showDeliveryOptions() {
-
+        tvNoList.setVisibility(View.GONE);
+        navList.setVisibility(View.VISIBLE);
+        if (deliveryList.size() == 0) {
+            deliveryList = prepareDataList("Delivery");
+            if (deliveryList.size() > 0) {
+                dashboardItemAdapter = new DashboardItemAdapter(context, deliveryList);
+                navList.setAdapter(dashboardItemAdapter);
+            } else {
+                navList.setVisibility(View.GONE);
+                tvNoList.setVisibility(View.VISIBLE);
+            }
+        } else {
+            dashboardItemAdapter = new DashboardItemAdapter(context, deliveryList);
+            navList.setAdapter(dashboardItemAdapter);
+        }
     }
 
-    private void showReportOptions() {
+    private void showAnalyticsOptions() {
+        tvNoList.setVisibility(View.GONE);
+        navList.setVisibility(View.VISIBLE);
+        if (analyticsList.size() == 0) {
+            analyticsList = prepareDataList("Analytics");
+            if (analyticsList.size() > 0) {
+                dashboardItemAdapter = new DashboardItemAdapter(context, analyticsList);
+                navList.setAdapter(dashboardItemAdapter);
+            } else {
+                navList.setVisibility(View.GONE);
+                tvNoList.setVisibility(View.VISIBLE);
+            }
+        } else {
+            dashboardItemAdapter = new DashboardItemAdapter(context, analyticsList);
+            navList.setAdapter(dashboardItemAdapter);
+        }
+    }
 
+    private ArrayList<DashboardItemModel> prepareDataList(String purpose) {
+        DashboardItemModel dashboardItem;
+        switch (purpose) {
+            case "Order and Visit":
+                if (dbHelper.isPrivileged(UserPrivilege.PlannedVisit.getAction())) {
+                    dashboardItem = new DashboardItemModel();
+                    dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
+                    dashboardItem.setTitle(getResources().getString(R.string.planned_visit));
+                    dashboardItem.setDescription(getResources().getString(R.string.planned_visit_desc));
+                    orderAndVisitList.add(dashboardItem);
+                }
+
+                if (dbHelper.isPrivileged(UserPrivilege.UnplannedVisit.getAction())) {
+                    dashboardItem = new DashboardItemModel();
+                    dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
+                    dashboardItem.setTitle(getResources().getString(R.string.unplanned_visit));
+                    dashboardItem.setDescription(getResources().getString(R.string.unplanned_visit_desc));
+                    orderAndVisitList.add(dashboardItem);
+                }
+
+                if (dbHelper.isPrivileged(UserPrivilege.NewOutletAddition.getAction())) {
+                    dashboardItem = new DashboardItemModel();
+                    dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
+                    dashboardItem.setTitle(getResources().getString(R.string.new_outlet_addition));
+                    dashboardItem.setDescription(getResources().getString(R.string.new_outlet_addition_desc));
+                    orderAndVisitList.add(dashboardItem);
+                }
+
+                if (dbHelper.isPrivileged(UserPrivilege.MultiSurvey.getAction())) {
+                    dashboardItem = new DashboardItemModel();
+                    dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
+                    dashboardItem.setTitle(getResources().getString(R.string.multi_survey));
+                    dashboardItem.setDescription(getResources().getString(R.string.multi_survey_desc));
+                    orderAndVisitList.add(dashboardItem);
+                }
+                return orderAndVisitList;
+            case "Delivery":
+                dashboardItem = new DashboardItemModel();
+                dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
+                dashboardItem.setTitle(getResources().getString(R.string.order_delivery));
+                dashboardItem.setDescription(getResources().getString(R.string.order_delivery_desc));
+                deliveryList.add(dashboardItem);
+
+                dashboardItem = new DashboardItemModel();
+                dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
+                dashboardItem.setTitle(getResources().getString(R.string.my_transactions));
+                dashboardItem.setDescription(getResources().getString(R.string.my_transactions_desc));
+                deliveryList.add(dashboardItem);
+
+                dashboardItem = new DashboardItemModel();
+                dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
+                dashboardItem.setTitle(getResources().getString(R.string.settlement));
+                dashboardItem.setDescription(getResources().getString(R.string.settlement_desc));
+                deliveryList.add(dashboardItem);
+
+                dashboardItem = new DashboardItemModel();
+                dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
+                dashboardItem.setTitle(getResources().getString(R.string.reload_stock));
+                dashboardItem.setDescription(getResources().getString(R.string.reload_stock_desc));
+                deliveryList.add(dashboardItem);
+                return deliveryList;
+            case "Analytics":
+                dashboardItem = new DashboardItemModel();
+                dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
+                dashboardItem.setTitle(getResources().getString(R.string.view_outlets));
+                dashboardItem.setDescription(getResources().getString(R.string.view_outlets_desc));
+                analyticsList.add(dashboardItem);
+
+                dashboardItem = new DashboardItemModel();
+                dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
+                dashboardItem.setTitle(getResources().getString(R.string.my_team));
+                dashboardItem.setDescription(getResources().getString(R.string.my_team_desc));
+                analyticsList.add(dashboardItem);
+
+                dashboardItem = new DashboardItemModel();
+                dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
+                dashboardItem.setTitle(getResources().getString(R.string.order_reports));
+                dashboardItem.setDescription(getResources().getString(R.string.order_reports_desc));
+                analyticsList.add(dashboardItem);
+
+                dashboardItem = new DashboardItemModel();
+                dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
+                dashboardItem.setTitle(getResources().getString(R.string.delivery_reports));
+                dashboardItem.setDescription(getResources().getString(R.string.delivery_reports_desc));
+                analyticsList.add(dashboardItem);
+
+                dashboardItem = new DashboardItemModel();
+                dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
+                dashboardItem.setTitle(getResources().getString(R.string.survey_reports));
+                dashboardItem.setDescription(getResources().getString(R.string.survey_reports_desc));
+                analyticsList.add(dashboardItem);
+                return analyticsList;
+            default:
+                return null;
+        }
     }
 
     private void confirmLogout() {

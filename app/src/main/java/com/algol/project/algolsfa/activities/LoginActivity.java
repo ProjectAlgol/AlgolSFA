@@ -25,9 +25,13 @@ import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.algol.project.algolsfa.helper.FileDownloader;
 import com.algol.project.algolsfa.helper.SQLiteHelper;
+import com.algol.project.algolsfa.interfaces.DownloadListener;
 import com.algol.project.algolsfa.others.Constants;
 import com.algol.project.algolsfa.R;
 import com.algol.project.algolsfa.helper.AppUtility;
@@ -37,7 +41,7 @@ import java.util.ArrayList;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener, DownloadListener {
     private EditText etUsername, etPassword;
     private ImageView ivPasswordVisibility;
     private boolean isPasswordVisible;
@@ -46,6 +50,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private Context context;
     private SQLiteHelper dbHelper;
     private String username, password;
+    private ProgressBar loginProgressBar;
 
     public static final int LOCALLY_AUTHENTIC = 0, LOCALLY_UNAUTHENTIC = 1, LOCALLY_UNAUTHORIZED = 2, LOCALLY_ANONYMOUS = 3;
 
@@ -69,6 +74,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         btnForgotPassword.setOnClickListener(this);
         isPasswordVisible = false;
         context = LoginActivity.this;
+        loginProgressBar = new ProgressBar(context, null, android.R.attr.progressBarStyleLarge);
 
         etPassword.addTextChangedListener(new TextWatcher() {
             @Override
@@ -226,6 +232,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 if (AppUtility.isAppOnline(context)) {
                     // logging in with different user. Invoke Login API
                     Toast.makeText(context, "Hang on, Trying to login with different user...", Toast.LENGTH_SHORT).show();
+                    downloadDatabase(Constants.databaseURL, Constants.databaseAbsolutePath);
                 } else {
                     showLoginAlert(getResources().getString(R.string.login_alert_invalid_username), SweetAlertDialog.ERROR_TYPE);
                 }
@@ -233,12 +240,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         } else {
             if (AppUtility.isAppOnline(context)) {
                 Toast.makeText(context, "Database ain't available. Hang on while trying to log in...", Toast.LENGTH_SHORT).show();
+                downloadDatabase(Constants.databaseURL, Constants.databaseAbsolutePath);
             } else {
                 showLoginAlert(getResources().getString(R.string.login_alert_go_online_and_try), SweetAlertDialog.WARNING_TYPE);
             }
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void showLoginAlert(String content, int alertType) {
         SweetAlertDialog loginAlert = new SweetAlertDialog(context, alertType);
         loginAlert.setCancelable(false);
@@ -246,14 +255,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             loginAlert.setTitleText("Offline Login");
         loginAlert.setContentText(content);
         if (content.equalsIgnoreCase(getResources().getString(R.string.login_alert_invalid_db_online))) {
-            loginAlert.setConfirmButton("Yes", SweetAlertDialog::dismissWithAnimation);
+            loginAlert.setConfirmButton("Yes", sweetAlertDialog -> {
+                sweetAlertDialog.dismissWithAnimation();
+                downloadDatabase(Constants.databaseURL, Constants.databaseAbsolutePath);
+            });
             loginAlert.setCancelButton("Not now", SweetAlertDialog::dismissWithAnimation);
         } else {
             loginAlert.setConfirmButton("Ok", sweetAlertDialog -> {
-                if (content.equalsIgnoreCase(getResources().getString(R.string.login_alert_offline_signin)))
+                if (content.equalsIgnoreCase(getResources().getString(R.string.login_alert_offline_signin))) {
                     login();
-                else
+                } else {
                     sweetAlertDialog.dismissWithAnimation();
+                }
             });
             loginAlert.showCancelButton(false);
         }
@@ -266,6 +279,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             neutralButton.setBackgroundResource(R.drawable.neutral_button_background);
         }
 
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void downloadDatabase(String downloadURL, String databasePath) {
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(100, 100);
+        layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+        RelativeLayout layout = findViewById(R.id.layout_login);
+        layout.addView(loginProgressBar, layoutParams);
+        AppUtility.showProgressBar(context, loginProgressBar);
+        new FileDownloader(context,"Database",this).download(downloadURL,databasePath);
     }
 
     private void login() {
@@ -370,5 +393,44 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             default:
                 break;
         }
+    }
+
+    @Override
+    public void onDownloadComplete(String fileType) {
+        AppUtility.hideProgressBar(context,loginProgressBar);
+        Toast.makeText(context,"Finished downloading database",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDownloadFailed(String fileType, int error) {
+        AppUtility.hideProgressBar(context,loginProgressBar);
+        String message;
+        switch(error) {
+            case FileDownloader.ERROR_BAD_NETWORK:
+                message= "Bad Network";
+                break;
+            case FileDownloader.ERROR_BAD_SERVER:
+                message= "Bad Server";
+                break;
+            case FileDownloader.ERROR_CONNECTION_TIME_OUT:
+                message= "Connection Timeout";
+                break;
+            case FileDownloader.ERROR_INVALID_FILE_DESTINATION:
+                message= "Invalid File Destination";
+                break;
+            case FileDownloader.ERROR_INVALID_URL:
+                message= "Invalid URL";
+                break;
+            case FileDownloader.ERROR_SERVER_RESPONSE:
+                message= "Error in Server Response";
+                break;
+            case FileDownloader.ERROR_UNEXPECTED:
+                message= "Unexpected Error Occurred";
+                break;
+            default:
+                message= "Unknown Error Occurred";
+                break;
+        }
+        Toast.makeText(context,message,Toast.LENGTH_SHORT).show();
     }
 }

@@ -39,6 +39,10 @@
     <string name="order_reports">Order Reports</string>
     <string name="delivery_reports">Delivery Reports</string>
     <string name="survey_reports">Survey Reports</string>
+    <string name="customer_segmentation_groupings">Customer Segmentation Groupings</string>
+    <string name="profitability_analysis">Profitability Analysis</string>
+    <string name="escalation_tracking">Escalation Tracking</string>
+    <string name="predictive_modelling">Predictive Modelling</string>
 
     <string name="daily_summary">Today\'s Summary</string>
 
@@ -59,4 +63,8 @@
     <string name="order_reports_desc">View the Order Reports</string>
     <string name="delivery_reports_desc">View the Delivery Reports</string>
     <string name="survey_reports_desc">View the Survey Reports</string>
+    <string name="customer_segmentation_groupings_desc">Customer Grouping based on purchase of items</string>
+    <string name="profitability_analysis_desc">View which customers contribute to the highest profits over time</string>
+    <string name="escalation_tracking_desc">Measure how often problems arise</string>
+    <string name="predictive_modelling_desc">Comparative product development plans in terms of future success</string>
 </resources>

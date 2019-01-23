@@ -5,6 +5,7 @@
 package com.algol.project.algolsfa.helper;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -12,6 +13,9 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.telephony.TelephonyManager;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.ProgressBar;
 
 /**
  * Created by Lykos on 01-Jan-19.
@@ -42,5 +46,15 @@ public class AppUtility {
     public static String getDeviceIMEI(Context context) {
         TelephonyManager telephonyManager= (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         return telephonyManager.getImei();
+    }
+
+    public static void showProgressBar(Context context, ProgressBar progressBar) {
+        progressBar.setVisibility(View.VISIBLE);
+        //((Activity)context).getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+    }
+
+    public static void hideProgressBar(Context context, ProgressBar progressBar) {
+        progressBar.setVisibility(View.GONE);
+        //((Activity)context).getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
 }

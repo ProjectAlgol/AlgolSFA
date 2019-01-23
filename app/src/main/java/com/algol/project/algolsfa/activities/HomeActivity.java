@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.algol.project.algolsfa.R;
 import com.algol.project.algolsfa.adapters.DashboardItemAdapter;
@@ -234,6 +235,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         DashboardItemModel dashboardItem;
         switch (purpose) {
             case "Order and Visit":
+                // Planned Visit
                 if (dbHelper.isPrivileged(UserPrivilege.PlannedVisit.getAction())) {
                     dashboardItem = new DashboardItemModel();
                     dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
@@ -242,6 +244,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     orderAndVisitList.add(dashboardItem);
                 }
 
+                // Unplanned Visit
                 if (dbHelper.isPrivileged(UserPrivilege.UnplannedVisit.getAction())) {
                     dashboardItem = new DashboardItemModel();
                     dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
@@ -250,6 +253,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     orderAndVisitList.add(dashboardItem);
                 }
 
+                // New Outlet Addition
                 if (dbHelper.isPrivileged(UserPrivilege.NewOutletAddition.getAction())) {
                     dashboardItem = new DashboardItemModel();
                     dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
@@ -258,6 +262,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     orderAndVisitList.add(dashboardItem);
                 }
 
+                // Multi Survey
                 if (dbHelper.isPrivileged(UserPrivilege.MultiSurvey.getAction())) {
                     dashboardItem = new DashboardItemModel();
                     dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
@@ -267,24 +272,28 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 return orderAndVisitList;
             case "Delivery":
+                // Order Delivery
                 dashboardItem = new DashboardItemModel();
                 dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
                 dashboardItem.setTitle(getResources().getString(R.string.order_delivery));
                 dashboardItem.setDescription(getResources().getString(R.string.order_delivery_desc));
                 deliveryList.add(dashboardItem);
 
+                // My Transaction
                 dashboardItem = new DashboardItemModel();
                 dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
                 dashboardItem.setTitle(getResources().getString(R.string.my_transactions));
                 dashboardItem.setDescription(getResources().getString(R.string.my_transactions_desc));
                 deliveryList.add(dashboardItem);
 
+                // Reload Stock
                 dashboardItem = new DashboardItemModel();
                 dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
                 dashboardItem.setTitle(getResources().getString(R.string.settlement));
                 dashboardItem.setDescription(getResources().getString(R.string.settlement_desc));
                 deliveryList.add(dashboardItem);
 
+                // Reload Stock
                 dashboardItem = new DashboardItemModel();
                 dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
                 dashboardItem.setTitle(getResources().getString(R.string.reload_stock));
@@ -292,39 +301,78 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 deliveryList.add(dashboardItem);
                 return deliveryList;
             case "Analytics":
+                // View Outlets
                 dashboardItem = new DashboardItemModel();
                 dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
                 dashboardItem.setTitle(getResources().getString(R.string.view_outlets));
                 dashboardItem.setDescription(getResources().getString(R.string.view_outlets_desc));
                 analyticsList.add(dashboardItem);
 
+                // My team
                 dashboardItem = new DashboardItemModel();
                 dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
                 dashboardItem.setTitle(getResources().getString(R.string.my_team));
                 dashboardItem.setDescription(getResources().getString(R.string.my_team_desc));
                 analyticsList.add(dashboardItem);
 
+                // Order Reports
                 dashboardItem = new DashboardItemModel();
                 dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
                 dashboardItem.setTitle(getResources().getString(R.string.order_reports));
                 dashboardItem.setDescription(getResources().getString(R.string.order_reports_desc));
                 analyticsList.add(dashboardItem);
 
+                // Delivery Reports
                 dashboardItem = new DashboardItemModel();
                 dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
                 dashboardItem.setTitle(getResources().getString(R.string.delivery_reports));
                 dashboardItem.setDescription(getResources().getString(R.string.delivery_reports_desc));
                 analyticsList.add(dashboardItem);
 
+                // Survey Reports
                 dashboardItem = new DashboardItemModel();
                 dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
                 dashboardItem.setTitle(getResources().getString(R.string.survey_reports));
                 dashboardItem.setDescription(getResources().getString(R.string.survey_reports_desc));
                 analyticsList.add(dashboardItem);
+
+                // Customer Segmentation Groupings
+                dashboardItem = new DashboardItemModel();
+                dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
+                dashboardItem.setTitle(getResources().getString(R.string.customer_segmentation_groupings));
+                dashboardItem.setDescription(getResources().getString(R.string.customer_segmentation_groupings_desc));
+                analyticsList.add(dashboardItem);
+
+                // Profitability Analysis
+                dashboardItem = new DashboardItemModel();
+                dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
+                dashboardItem.setTitle(getResources().getString(R.string.profitability_analysis));
+                dashboardItem.setDescription(getResources().getString(R.string.profitability_analysis_desc));
+                analyticsList.add(dashboardItem);
+
+                // Escalation Tracking
+                dashboardItem = new DashboardItemModel();
+                dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
+                dashboardItem.setTitle(getResources().getString(R.string.escalation_tracking));
+                dashboardItem.setDescription(getResources().getString(R.string.escalation_tracking_desc));
+                analyticsList.add(dashboardItem);
+
+                // Predictive Modelling
+                dashboardItem = new DashboardItemModel();
+                dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
+                dashboardItem.setTitle(getResources().getString(R.string.predictive_modelling));
+                dashboardItem.setDescription(getResources().getString(R.string.predictive_modelling_desc));
+                analyticsList.add(dashboardItem);
                 return analyticsList;
             default:
                 return null;
         }
+    }
+
+    public void onDashboardListItemClick(View view) {
+        String title= ((TextView)view.findViewById(R.id.tv_dashboard_item_title)).getText().toString();
+        String message= "Opening " + title;
+        Toast.makeText(context,message,Toast.LENGTH_SHORT).show();
     }
 
     private void confirmLogout() {

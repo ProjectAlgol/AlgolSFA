@@ -33,7 +33,11 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void resumeApp() {
+    private void resumeApp()
+    /*
+    * redirects the user to either the Login screen or the Home screen based on local authentication
+    * */
+    {
         Constants.init(context);
         Intent loginIntent = new Intent(context, LoginActivity.class);
         Intent homeIntent = new Intent(context, HomeActivity.class);

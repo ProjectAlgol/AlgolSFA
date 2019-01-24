@@ -14,7 +14,7 @@ import java.io.File;
 public class Constants {
     private static final String keyPrefix= BuildConfig.APPLICATION_ID + ".";
     public static final String LOGIN_CRED_KEY= keyPrefix + "LoginCredentials";
-    public static String databaseAbsolutePath= null;
+    public static String databaseAbsolutePath= null, databaseFolder= null;
     public static int databaseVersion;
     public static String databaseURL= "https://mystuffs.000webhostapp.com/SQLite/algolsfa.db";
     // permission codes
@@ -50,7 +50,8 @@ public class Constants {
     * initializes the context specific constant values
     * */
     {
-        databaseAbsolutePath = android.os.Environment.getExternalStorageDirectory() + File.separator + context.getResources().getString(R.string.database_dir) + File.separator + context.getResources().getString(R.string.database_name);
+        databaseFolder= android.os.Environment.getExternalStorageDirectory() + File.separator + context.getResources().getString(R.string.database_dir) + File.separator;
+        databaseAbsolutePath = databaseFolder + context.getResources().getString(R.string.database_name);
         databaseVersion= context.getResources().getInteger(R.integer.database_version);
     }
 }

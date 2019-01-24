@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 
-import com.algol.project.algolsfa.interfaces.DownloadListener;
+import com.algol.project.algolsfa.pojos.DownloadStatus;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,52 +26,49 @@ import java.nio.channels.ReadableByteChannel;
 public class FileDownloader {
     private Context context;
     private String fileType;
-    private DownloadListener downloadListener;
     private File destinationFile;
 
     /* Custom Download-Errors */
     public static final int ERROR_INVALID_URL = 0, ERROR_BAD_SERVER = 1, ERROR_BAD_NETWORK = 2, ERROR_UNEXPECTED = 3, ERROR_CONNECTION_TIME_OUT = 4, ERROR_INVALID_FILE_DESTINATION = 5, ERROR_SERVER_RESPONSE = 6;
+    public static final int DOWNLOAD_SUCCESS= 7;
     /* ---------------------- */
 
-    public FileDownloader(Context context, String fileType, DownloadListener downloadListener) {
+    public FileDownloader(Context context, String fileType) {
         this.context = context;
         this.fileType = fileType;
-        this.downloadListener = downloadListener;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public void download(String downloadURL, String destination) {
+    public DownloadStatus download(String downloadURL, String destination) {
         try {
             destinationFile = new File(destination);
             if (!destinationFile.exists())
                 destinationFile.createNewFile();
-            new Thread(() -> {
+            try {
+                URL fileURL = new URL(downloadURL);
                 try {
-                    URL fileURL = new URL(downloadURL);
-                    try {
-                        URLConnection urlConnection = fileURL.openConnection();
-                        if (urlConnection instanceof HttpURLConnection) {
-                            connect((HttpURLConnection) urlConnection);
-                        } else {
-                            throw new IOException();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        downloadListener.onDownloadFailed(fileType, ERROR_INVALID_URL);
+                    URLConnection urlConnection = fileURL.openConnection();
+                    if (urlConnection instanceof HttpURLConnection) {
+                        return connect((HttpURLConnection) urlConnection);
+                    } else {
+                        throw new IOException();
                     }
-                } catch (MalformedURLException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
-                    downloadListener.onDownloadFailed(fileType, ERROR_INVALID_URL);
+                    return new DownloadStatus(fileType,ERROR_INVALID_URL);
                 }
-            }).start();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                return new DownloadStatus(fileType,ERROR_INVALID_URL);
+            }
         } catch (IOException e) {
             e.printStackTrace();
-            downloadListener.onDownloadFailed(fileType, ERROR_INVALID_FILE_DESTINATION);
+            return new DownloadStatus(fileType,ERROR_INVALID_FILE_DESTINATION);
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void connect(HttpURLConnection connection) {
+    private DownloadStatus connect(HttpURLConnection connection) {
         try {
             connection.setAllowUserInteraction(false);
             connection.setInstanceFollowRedirects(true);
@@ -81,30 +78,26 @@ public class FileDownloader {
             // on receiving response
             switch (connection.getResponseCode()) {
                 case HttpURLConnection.HTTP_OK:
-                    processResponse(connection.getInputStream(), connection.getContentLengthLong());
-                    break;
+                    return processResponse(connection.getInputStream(), connection.getContentLengthLong());
                 case HttpURLConnection.HTTP_CLIENT_TIMEOUT:
                 case HttpURLConnection.HTTP_GATEWAY_TIMEOUT:
-                    downloadListener.onDownloadFailed(fileType, ERROR_CONNECTION_TIME_OUT);
-                    break;
+                    return new DownloadStatus(fileType,ERROR_CONNECTION_TIME_OUT);
                 case HttpURLConnection.HTTP_INTERNAL_ERROR:
                 case HttpURLConnection.HTTP_NOT_FOUND:
-                    downloadListener.onDownloadFailed(fileType, ERROR_BAD_SERVER);
-                    break;
+                    return new DownloadStatus(fileType,ERROR_BAD_SERVER);
                 default:
-                    downloadListener.onDownloadFailed(fileType, ERROR_UNEXPECTED);
-                    break;
+                    return new DownloadStatus(fileType,ERROR_UNEXPECTED);
             }
         } catch (ProtocolException e) {
             e.printStackTrace();
-            downloadListener.onDownloadFailed(fileType, ERROR_UNEXPECTED);
+            return new DownloadStatus(fileType,ERROR_UNEXPECTED);
         } catch (IOException e) {
             e.printStackTrace();
-            downloadListener.onDownloadFailed(fileType, ERROR_UNEXPECTED);
+            return new DownloadStatus(fileType,ERROR_UNEXPECTED);
         }
     }
 
-    private void processResponse(InputStream inputStream, long contentLength) {
+    private DownloadStatus processResponse(InputStream inputStream, long contentLength) {
         if (inputStream != null) {
             ReadableByteChannel channel = Channels.newChannel(inputStream);
             try {
@@ -113,18 +106,21 @@ public class FileDownloader {
                 fileOutputStream.close();
                 inputStream.close();
                 if (destinationFile.length() < contentLength) {
-                    downloadListener.onDownloadFailed(fileType, ERROR_UNEXPECTED);
                     destinationFile.delete();
+                    return new DownloadStatus(fileType,ERROR_UNEXPECTED);
                 } else {
-                    downloadListener.onDownloadComplete(fileType);
+                    return new DownloadStatus(fileType,DOWNLOAD_SUCCESS);
                 }
             } catch (FileNotFoundException e) {
-                downloadListener.onDownloadFailed(fileType, ERROR_INVALID_FILE_DESTINATION);
                 e.printStackTrace();
+                return new DownloadStatus(fileType,ERROR_INVALID_FILE_DESTINATION);
             } catch (IOException e) {
-                downloadListener.onDownloadFailed(fileType, ERROR_SERVER_RESPONSE);
                 e.printStackTrace();
+                return new DownloadStatus(fileType,ERROR_SERVER_RESPONSE);
             }
+        }
+        else {
+            return new DownloadStatus(fileType,ERROR_SERVER_RESPONSE);
         }
     }
 }

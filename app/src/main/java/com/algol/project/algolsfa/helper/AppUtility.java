@@ -47,14 +47,4 @@ public class AppUtility {
         TelephonyManager telephonyManager= (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         return telephonyManager.getImei();
     }
-
-    public static void showProgressBar(Context context, ProgressBar progressBar) {
-        progressBar.setVisibility(View.VISIBLE);
-        //((Activity)context).getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-    }
-
-    public static void hideProgressBar(Context context, ProgressBar progressBar) {
-        progressBar.setVisibility(View.GONE);
-        //((Activity)context).getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-    }
 }

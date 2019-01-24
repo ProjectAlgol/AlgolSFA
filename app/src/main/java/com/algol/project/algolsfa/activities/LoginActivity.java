@@ -1,11 +1,15 @@
 package com.algol.project.algolsfa.activities;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
@@ -17,6 +21,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,12 +34,14 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.algol.project.algolsfa.handlers.DownloadHandler;
 import com.algol.project.algolsfa.helper.FileDownloader;
 import com.algol.project.algolsfa.helper.SQLiteHelper;
 import com.algol.project.algolsfa.interfaces.DownloadListener;
 import com.algol.project.algolsfa.others.Constants;
 import com.algol.project.algolsfa.R;
 import com.algol.project.algolsfa.helper.AppUtility;
+import com.algol.project.algolsfa.pojos.DownloadStatus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -74,7 +81,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         btnForgotPassword.setOnClickListener(this);
         isPasswordVisible = false;
         context = LoginActivity.this;
-        loginProgressBar = new ProgressBar(context, null, android.R.attr.progressBarStyleLarge);
+        loginProgressBar = new ProgressBar(context,null,android.R.attr.progressBarStyleLarge);
+        RelativeLayout layoutLogin= findViewById(R.id.layout_login);
+        RelativeLayout.LayoutParams params= new RelativeLayout.LayoutParams(100,100);
+        params.addRule(RelativeLayout.CENTER_IN_PARENT);
+        layoutLogin.addView(loginProgressBar,params);
+        loginProgressBar.setVisibility(View.GONE);
 
         etPassword.addTextChangedListener(new TextWatcher() {
             @Override
@@ -232,7 +244,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 if (AppUtility.isAppOnline(context)) {
                     // logging in with different user. Invoke Login API
                     Toast.makeText(context, "Hang on, Trying to login with different user...", Toast.LENGTH_SHORT).show();
-                    downloadDatabase(Constants.databaseURL, Constants.databaseAbsolutePath);
+                    downloadDatabase();
                 } else {
                     showLoginAlert(getResources().getString(R.string.login_alert_invalid_username), SweetAlertDialog.ERROR_TYPE);
                 }
@@ -240,7 +252,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         } else {
             if (AppUtility.isAppOnline(context)) {
                 Toast.makeText(context, "Database ain't available. Hang on while trying to log in...", Toast.LENGTH_SHORT).show();
-                downloadDatabase(Constants.databaseURL, Constants.databaseAbsolutePath);
+                downloadDatabase();
             } else {
                 showLoginAlert(getResources().getString(R.string.login_alert_go_online_and_try), SweetAlertDialog.WARNING_TYPE);
             }
@@ -257,7 +269,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         if (content.equalsIgnoreCase(getResources().getString(R.string.login_alert_invalid_db_online))) {
             loginAlert.setConfirmButton("Yes", sweetAlertDialog -> {
                 sweetAlertDialog.dismissWithAnimation();
-                downloadDatabase(Constants.databaseURL, Constants.databaseAbsolutePath);
+                downloadDatabase();
             });
             loginAlert.setCancelButton("Not now", SweetAlertDialog::dismissWithAnimation);
         } else {
@@ -282,13 +294,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void downloadDatabase(String downloadURL, String databasePath) {
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(100, 100);
-        layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
-        RelativeLayout layout = findViewById(R.id.layout_login);
-        layout.addView(loginProgressBar, layoutParams);
-        AppUtility.showProgressBar(context, loginProgressBar);
-        new FileDownloader(context,"Database",this).download(downloadURL,databasePath);
+    private void downloadDatabase() {
+        loginProgressBar.setVisibility(View.VISIBLE);
+        File dbFolder = new File(Constants.databaseFolder);
+        if (!dbFolder.exists())
+            dbFolder.mkdir();
+        FileDownloader fileDownloader = new FileDownloader(context, "Database");
+        new Thread(() -> {
+            Looper.prepare();
+            DownloadStatus downloadStatus = fileDownloader.download(Constants.databaseURL, Constants.databaseAbsolutePath);
+            Message message = Message.obtain();
+            message.obj = downloadStatus;
+            new DownloadHandler(context,this).sendMessage(message);
+            Looper.loop();
+        });
     }
 
     private void login() {
@@ -397,40 +416,43 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onDownloadComplete(String fileType) {
-        AppUtility.hideProgressBar(context,loginProgressBar);
+        loginProgressBar.setVisibility(View.GONE);
         Toast.makeText(context,"Finished downloading database",Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onDownloadFailed(String fileType, int error) {
-        AppUtility.hideProgressBar(context,loginProgressBar);
+        loginProgressBar.setVisibility(View.GONE);
         String message;
-        switch(error) {
+        switch (error) {
             case FileDownloader.ERROR_BAD_NETWORK:
-                message= "Bad Network";
+                message = "Bad Network";
                 break;
             case FileDownloader.ERROR_BAD_SERVER:
-                message= "Bad Server";
+                message = "Bad Server";
                 break;
             case FileDownloader.ERROR_CONNECTION_TIME_OUT:
-                message= "Connection Timeout";
+                message = "Connection Timeout";
                 break;
             case FileDownloader.ERROR_INVALID_FILE_DESTINATION:
-                message= "Invalid File Destination";
+                message = "Invalid File Destination";
                 break;
             case FileDownloader.ERROR_INVALID_URL:
-                message= "Invalid URL";
+                message = "Invalid URL";
                 break;
             case FileDownloader.ERROR_SERVER_RESPONSE:
-                message= "Error in Server Response";
+                message = "Error in Server Response";
                 break;
             case FileDownloader.ERROR_UNEXPECTED:
-                message= "Unexpected Error Occurred";
+                message = "Unexpected Error Occurred";
                 break;
             default:
-                message= "Unknown Error Occurred";
+                message = "Unknown Error Occurred";
                 break;
         }
         Toast.makeText(context,message,Toast.LENGTH_SHORT).show();
+        File incompleteDB = new File(Constants.databaseAbsolutePath);
+        if (incompleteDB.exists())
+            incompleteDB.delete();
     }
 }

@@ -16,7 +16,8 @@ public class Constants {
     public static final String LOGIN_CRED_KEY= keyPrefix + "LoginCredentials";
     public static String databaseAbsolutePath= null, databaseFolder= null;
     public static int databaseVersion;
-    public static String databaseURL= "https://mystuffs.000webhostapp.com/SQLite/algolsfa.db";
+    //public static String databaseURL= "https://mystuffs.000webhostapp.com/SQLite/algolsfa.db";
+    public static String databaseURL= "http://dev.gobizmo.in/Saleslite/SalesliteAX/AXTransactionAPI/SQLite/13878/coke.DB";
     // permission codes
     public static final int REQUEST_LOGIN_PERMISSION= 1; // Permissions: Location, External drive read and write
     public static final int REQUEST_CAMERA_PERMISSION= 2; // Permissions: Image Capture, Bar code and QR code scan

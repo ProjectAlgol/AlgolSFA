@@ -1,15 +1,11 @@
 package com.algol.project.algolsfa.activities;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
@@ -21,7 +17,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,14 +30,12 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.algol.project.algolsfa.async.AsyncDownloader;
-import com.algol.project.algolsfa.handlers.DownloadHandler;
 import com.algol.project.algolsfa.helper.FileDownloader;
 import com.algol.project.algolsfa.helper.SQLiteHelper;
 import com.algol.project.algolsfa.interfaces.DownloadListener;
 import com.algol.project.algolsfa.others.Constants;
 import com.algol.project.algolsfa.R;
 import com.algol.project.algolsfa.helper.AppUtility;
-import com.algol.project.algolsfa.pojos.DownloadStatus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -409,13 +402,21 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
-    public void onDownloadComplete(String fileType) {
+    public void onDownloadComplete(String fileType)
+    /*
+    * invoked when the file is successfully downloaded.
+    * */
+    {
         loginProgressBar.setVisibility(View.GONE);
         Toast.makeText(context,"Finished downloading database",Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onDownloadFailed(String fileType, int error) {
+    public void onDownloadFailed(String fileType, int error)
+    /*
+    * invoked when the file download fails
+    * */
+    {
         loginProgressBar.setVisibility(View.GONE);
         String message;
         switch (error) {

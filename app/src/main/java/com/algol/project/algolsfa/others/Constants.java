@@ -21,6 +21,9 @@ public class Constants {
     public static final int REQUEST_LOGIN_PERMISSION= 1; // Permissions: Location, External drive read and write
     public static final int REQUEST_CAMERA_PERMISSION= 2; // Permissions: Image Capture, Bar code and QR code scan
 
+    // file types
+    public static final String FILE_DB= "Database", FILE_APP= "Application";
+
     // privilege purposes
     public enum UserPrivilege {
         OrderAndVisit("Order and Visit"), Delivery("Delivery"), Analytics("Analytics"), PlannedVisit("Planned Visit"), UnplannedVisit("Unplanned Visit"), NewOutletAddition("New Outlet Addition"), MultiSurvey("Multi Survey");

@@ -34,6 +34,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.algol.project.algolsfa.async.AsyncDownloader;
 import com.algol.project.algolsfa.handlers.DownloadHandler;
 import com.algol.project.algolsfa.helper.FileDownloader;
 import com.algol.project.algolsfa.helper.SQLiteHelper;
@@ -299,15 +300,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         File dbFolder = new File(Constants.databaseFolder);
         if (!dbFolder.exists())
             dbFolder.mkdir();
-        FileDownloader fileDownloader = new FileDownloader(context, "Database");
-        new Thread(() -> {
-            Looper.prepare();
-            DownloadStatus downloadStatus = fileDownloader.download(Constants.databaseURL, Constants.databaseAbsolutePath);
-            Message message = Message.obtain();
-            message.obj = downloadStatus;
-            new DownloadHandler(context,this).sendMessage(message);
-            Looper.loop();
-        });
+        AsyncDownloader asyncDownloader= new AsyncDownloader(context,Constants.FILE_DB,this);
+        asyncDownloader.execute(Constants.databaseURL,Constants.databaseAbsolutePath);
     }
 
     private void login() {

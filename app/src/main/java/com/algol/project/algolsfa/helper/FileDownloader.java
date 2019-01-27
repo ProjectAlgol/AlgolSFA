@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 
+import com.algol.project.algolsfa.interfaces.ProgressListener;
+import com.algol.project.algolsfa.others.Constants;
 import com.algol.project.algolsfa.pojos.DownloadStatus;
 
 import java.io.File;
@@ -27,15 +29,12 @@ public class FileDownloader {
     private Context context;
     private String fileType;
     private File destinationFile;
+    private ProgressListener downloadProgressListener;
 
-    /* Custom Download-Errors */
-    public static final int ERROR_INVALID_URL = 0, ERROR_BAD_SERVER = 1, ERROR_BAD_NETWORK = 2, ERROR_UNEXPECTED = 3, ERROR_CONNECTION_TIME_OUT = 4, ERROR_INVALID_FILE_DESTINATION = 5, ERROR_SERVER_RESPONSE = 6;
-    public static final int DOWNLOAD_SUCCESS= 7;
-    /* ---------------------- */
-
-    public FileDownloader(Context context, String fileType) {
+    public FileDownloader(Context context, String fileType, ProgressListener downloadProgressListener) {
         this.context = context;
         this.fileType = fileType;
+        this.downloadProgressListener = downloadProgressListener;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -55,15 +54,15 @@ public class FileDownloader {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    return new DownloadStatus(fileType,ERROR_INVALID_URL);
+                    return new DownloadStatus(fileType, Constants.ERROR_INVALID_URL);
                 }
             } catch (MalformedURLException e) {
                 e.printStackTrace();
-                return new DownloadStatus(fileType,ERROR_INVALID_URL);
+                return new DownloadStatus(fileType, Constants.ERROR_INVALID_URL);
             }
         } catch (IOException e) {
             e.printStackTrace();
-            return new DownloadStatus(fileType,ERROR_INVALID_FILE_DESTINATION);
+            return new DownloadStatus(fileType, Constants.ERROR_INVALID_FILE_DESTINATION);
         }
     }
 
@@ -73,54 +72,60 @@ public class FileDownloader {
             connection.setAllowUserInteraction(false);
             connection.setInstanceFollowRedirects(true);
             connection.setRequestMethod("GET");
-            connection.connect(); // blocking call
-
-            // on receiving response
-            switch (connection.getResponseCode()) {
+            connection.connect();
+            switch (connection.getResponseCode()) { // blocking call
                 case HttpURLConnection.HTTP_OK:
-                    return processResponse(connection.getInputStream(), connection.getContentLengthLong());
+                    return processFileTransfer(connection.getInputStream(), connection.getContentLengthLong());
                 case HttpURLConnection.HTTP_CLIENT_TIMEOUT:
                 case HttpURLConnection.HTTP_GATEWAY_TIMEOUT:
-                    return new DownloadStatus(fileType,ERROR_CONNECTION_TIME_OUT);
+                    return new DownloadStatus(fileType, Constants.ERROR_CONNECTION_TIME_OUT);
                 case HttpURLConnection.HTTP_INTERNAL_ERROR:
                 case HttpURLConnection.HTTP_NOT_FOUND:
-                    return new DownloadStatus(fileType,ERROR_BAD_SERVER);
+                    return new DownloadStatus(fileType, Constants.ERROR_BAD_SERVER);
                 default:
-                    return new DownloadStatus(fileType,ERROR_UNEXPECTED);
+                    return new DownloadStatus(fileType, Constants.ERROR_UNEXPECTED);
             }
         } catch (ProtocolException e) {
             e.printStackTrace();
-            return new DownloadStatus(fileType,ERROR_UNEXPECTED);
+            return new DownloadStatus(fileType, Constants.ERROR_UNEXPECTED);
         } catch (IOException e) {
             e.printStackTrace();
-            return new DownloadStatus(fileType,ERROR_UNEXPECTED);
+            return new DownloadStatus(fileType, Constants.ERROR_UNEXPECTED);
         }
     }
 
-    private DownloadStatus processResponse(InputStream inputStream, long contentLength) {
+    private DownloadStatus processFileTransfer(InputStream inputStream, long contentLength) {
+        int downloadProgress;
+        long receivedBytes = 0;
+        long bufferSize = (Constants.downloadBufferSize > contentLength) ? contentLength : Constants.downloadBufferSize;
+
         if (inputStream != null) {
             ReadableByteChannel channel = Channels.newChannel(inputStream);
             try {
                 FileOutputStream fileOutputStream = new FileOutputStream(destinationFile);
-                fileOutputStream.getChannel().transferFrom(channel, 0, Long.MAX_VALUE);
+                while (receivedBytes < contentLength) {
+                    receivedBytes += fileOutputStream.getChannel().transferFrom(channel, receivedBytes, bufferSize); // blocking call, transferring data from source to destination
+                    downloadProgress = (int) (((double) receivedBytes / contentLength) * 100);
+                    downloadProgressListener.onProgress(downloadProgress);
+                }
+
                 fileOutputStream.close();
                 inputStream.close();
                 if (destinationFile.length() < contentLength) {
                     destinationFile.delete();
-                    return new DownloadStatus(fileType,ERROR_UNEXPECTED);
+                    return new DownloadStatus(fileType, Constants.ERROR_UNEXPECTED);
                 } else {
-                    return new DownloadStatus(fileType,DOWNLOAD_SUCCESS);
+                    return new DownloadStatus(fileType, Constants.DOWNLOAD_SUCCESS);
                 }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                return new DownloadStatus(fileType,ERROR_INVALID_FILE_DESTINATION);
+                return new DownloadStatus(fileType, Constants.ERROR_INVALID_FILE_DESTINATION);
             } catch (IOException e) {
                 e.printStackTrace();
-                return new DownloadStatus(fileType,ERROR_SERVER_RESPONSE);
+                return new DownloadStatus(fileType, Constants.ERROR_SERVER_RESPONSE);
             }
-        }
-        else {
-            return new DownloadStatus(fileType,ERROR_SERVER_RESPONSE);
+        } else {
+            return new DownloadStatus(fileType, Constants.ERROR_SERVER_RESPONSE);
         }
     }
 }

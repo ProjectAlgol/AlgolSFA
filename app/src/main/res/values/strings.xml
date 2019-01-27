@@ -67,4 +67,11 @@
     <string name="profitability_analysis_desc">View which customers contribute to the highest profits over time</string>
     <string name="escalation_tracking_desc">Measure how often problems arise</string>
     <string name="predictive_modelling_desc">Comparative product development plans in terms of future success</string>
+    <!-- __________________________ -->
+
+    <!-- progress bar message -->
+    <string name="hang_on">Hang on…</string>
+    <string name="connecting_server">Connecting to server…</string>
+    <string name="downloading_db">Downloading database. Please wait…</string>
+    <string name="database_downloaded">Database downloaded</string>
 </resources>

@@ -12,6 +12,8 @@ import android.support.annotation.RequiresApi;
 import com.algol.project.algolsfa.helper.FileDownloader;
 import com.algol.project.algolsfa.interfaces.DownloadListener;
 
+import com.algol.project.algolsfa.interfaces.ProgressListener;
+import com.algol.project.algolsfa.others.Constants;
 import com.algol.project.algolsfa.pojos.DownloadStatus;
 
 
@@ -19,7 +21,7 @@ import com.algol.project.algolsfa.pojos.DownloadStatus;
  * Created by swarnavo.dutta on 1/25/2019.
  */
 
-public class AsyncDownloader extends AsyncTask<String, String, DownloadStatus> {
+public class AsyncDownloader extends AsyncTask<String, Integer, DownloadStatus> implements ProgressListener {
     private Context context;
     private DownloadListener downloadListener;
     private String fileType;
@@ -40,15 +42,15 @@ public class AsyncDownloader extends AsyncTask<String, String, DownloadStatus> {
     protected DownloadStatus doInBackground(String[] params)
     /*
     * downloads the find in background thread
-    * */
-    {
-        FileDownloader fileDownloader = new FileDownloader(context, fileType);
+    * */ {
+        FileDownloader fileDownloader = new FileDownloader(context, fileType,this);
         return fileDownloader.download(params[0], params[1]); // Download URL, File Destination
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
-    protected void onProgressUpdate(String... values) {
-        super.onProgressUpdate(values);
+    protected void onProgressUpdate(Integer... values) {
+        downloadListener.onProgressUpdate(fileType,values[0]);
     }
 
     @Override
@@ -56,11 +58,15 @@ public class AsyncDownloader extends AsyncTask<String, String, DownloadStatus> {
     /*
     * Based on the download completion status (Failed or succeeded), it invokes the callback methods in the UI thread.
     * On Download failed, the error is also passed to the callback.
-    * */
-    {
-        if (downloadStatus.getStatus() == FileDownloader.DOWNLOAD_SUCCESS)
+    * */ {
+        if (downloadStatus.getStatus() == Constants.DOWNLOAD_SUCCESS)
             downloadListener.onDownloadComplete(downloadStatus.getFileType());
         else
             downloadListener.onDownloadFailed(downloadStatus.getFileType(), downloadStatus.getStatus());
+    }
+
+    @Override
+    public void onProgress(int progress) {
+        publishProgress(progress);
     }
 }

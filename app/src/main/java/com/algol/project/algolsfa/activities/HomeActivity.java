@@ -72,7 +72,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         analyticsList = new ArrayList<>();
         int tabCount = 0;
 
-        if (dbHelper.isPrivileged(UserPrivilege.OrderAndVisit.getAction())) {
+        if (dbHelper.isPrivileged(UserPrivilege.OrderAndVisit.getValue())) {
             tabOrderAndVisit.setOnClickListener(this);
             btnOrderAndVisit.setOnClickListener(this);
             tabCount++;
@@ -81,7 +81,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             tabOrderAndVisit.setVisibility(View.GONE);
         }
 
-        if (dbHelper.isPrivileged(UserPrivilege.Delivery.getAction())) {
+        if (dbHelper.isPrivileged(UserPrivilege.Delivery.getValue())) {
             tabDelivery.setOnClickListener(this);
             btnDelivery.setOnClickListener(this);
             tabCount++;
@@ -94,7 +94,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             tabDelivery.setVisibility(View.GONE);
         }
 
-        if (dbHelper.isPrivileged(UserPrivilege.Analytics.getAction())) {
+        if (dbHelper.isPrivileged(UserPrivilege.Analytics.getValue())) {
             tabAnalytics.setOnClickListener(this);
             btnAnalytics.setOnClickListener(this);
             tabCount++;
@@ -236,7 +236,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         switch (purpose) {
             case "Order and Visit":
                 // Planned Visit
-                if (dbHelper.isPrivileged(UserPrivilege.PlannedVisit.getAction())) {
+                if (dbHelper.isPrivileged(UserPrivilege.PlannedVisit.getValue())) {
                     dashboardItem = new DashboardItemModel();
                     dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
                     dashboardItem.setTitle(getResources().getString(R.string.planned_visit));
@@ -245,7 +245,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 }
 
                 // Unplanned Visit
-                if (dbHelper.isPrivileged(UserPrivilege.UnplannedVisit.getAction())) {
+                if (dbHelper.isPrivileged(UserPrivilege.UnplannedVisit.getValue())) {
                     dashboardItem = new DashboardItemModel();
                     dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
                     dashboardItem.setTitle(getResources().getString(R.string.unplanned_visit));
@@ -254,7 +254,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 }
 
                 // New Outlet Addition
-                if (dbHelper.isPrivileged(UserPrivilege.NewOutletAddition.getAction())) {
+                if (dbHelper.isPrivileged(UserPrivilege.NewOutletAddition.getValue())) {
                     dashboardItem = new DashboardItemModel();
                     dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
                     dashboardItem.setTitle(getResources().getString(R.string.new_outlet_addition));
@@ -263,7 +263,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 }
 
                 // Multi Survey
-                if (dbHelper.isPrivileged(UserPrivilege.MultiSurvey.getAction())) {
+                if (dbHelper.isPrivileged(UserPrivilege.MultiSurvey.getValue())) {
                     dashboardItem = new DashboardItemModel();
                     dashboardItem.setIcon(getResources().getDrawable(R.drawable.outlet));
                     dashboardItem.setTitle(getResources().getString(R.string.multi_survey));

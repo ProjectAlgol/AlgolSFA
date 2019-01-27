@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.Layout;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
 import android.view.Menu;
@@ -27,11 +28,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.algol.project.algolsfa.async.AsyncDownloader;
 import com.algol.project.algolsfa.helper.FileDownloader;
 import com.algol.project.algolsfa.helper.SQLiteHelper;
+import com.algol.project.algolsfa.interfaces.APIInvocationListener;
 import com.algol.project.algolsfa.interfaces.DownloadListener;
 import com.algol.project.algolsfa.others.Constants;
 import com.algol.project.algolsfa.R;
@@ -42,7 +45,7 @@ import java.util.ArrayList;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener, DownloadListener {
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener, DownloadListener, APIInvocationListener {
     private EditText etUsername, etPassword;
     private ImageView ivPasswordVisibility;
     private boolean isPasswordVisible;
@@ -52,6 +55,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private SQLiteHelper dbHelper;
     private String username, password;
     private ProgressBar loginProgressBar;
+    private TextView tvProgressBarDescription, tvProgress;
+    private View layoutLoginProgressBar;
 
     public static final int LOCALLY_AUTHENTIC = 0, LOCALLY_UNAUTHENTIC = 1, LOCALLY_UNAUTHORIZED = 2, LOCALLY_ANONYMOUS = 3;
 
@@ -75,12 +80,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         btnForgotPassword.setOnClickListener(this);
         isPasswordVisible = false;
         context = LoginActivity.this;
-        loginProgressBar = new ProgressBar(context,null,android.R.attr.progressBarStyleLarge);
-        RelativeLayout layoutLogin= findViewById(R.id.layout_login);
-        RelativeLayout.LayoutParams params= new RelativeLayout.LayoutParams(100,100);
-        params.addRule(RelativeLayout.CENTER_IN_PARENT);
-        layoutLogin.addView(loginProgressBar,params);
-        loginProgressBar.setVisibility(View.GONE);
+
+        // progress bar objects
+        layoutLoginProgressBar= findViewById(R.id.layout_progressbar_login);
+        loginProgressBar = findViewById(R.id.progressbar);
+        tvProgressBarDescription= findViewById(R.id.tv_progress_description);
+        tvProgress= findViewById(R.id.tv_progress);
 
         etPassword.addTextChangedListener(new TextWatcher() {
             @Override
@@ -289,11 +294,19 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void downloadDatabase() {
-        loginProgressBar.setVisibility(View.VISIBLE);
+        // setting up progress bar
+        tvProgressBarDescription.setText(getResources().getString(R.string.connecting_server));
+        loginProgressBar.setVisibility(View.GONE);
+        tvProgress.setVisibility(View.GONE);
+        layoutLoginProgressBar.setVisibility(View.VISIBLE);
+
         File dbFolder = new File(Constants.databaseFolder);
         if (!dbFolder.exists())
             dbFolder.mkdir();
         AsyncDownloader asyncDownloader= new AsyncDownloader(context,Constants.FILE_DB,this);
+        tvProgressBarDescription.setText(getResources().getString(R.string.downloading_db));
+        loginProgressBar.setVisibility(View.VISIBLE);
+        tvProgress.setVisibility(View.VISIBLE);
         asyncDownloader.execute(Constants.databaseURL,Constants.databaseAbsolutePath);
     }
 
@@ -407,8 +420,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     * invoked when the file is successfully downloaded.
     * */
     {
-        loginProgressBar.setVisibility(View.GONE);
-        Toast.makeText(context,"Finished downloading database",Toast.LENGTH_SHORT).show();
+        layoutLoginProgressBar.setVisibility(View.GONE);
+
     }
 
     @Override
@@ -417,28 +430,28 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     * invoked when the file download fails
     * */
     {
-        loginProgressBar.setVisibility(View.GONE);
+        layoutLoginProgressBar.setVisibility(View.GONE);
         String message;
         switch (error) {
-            case FileDownloader.ERROR_BAD_NETWORK:
+            case Constants.ERROR_BAD_NETWORK:
                 message = "Bad Network";
                 break;
-            case FileDownloader.ERROR_BAD_SERVER:
+            case Constants.ERROR_BAD_SERVER:
                 message = "Bad Server";
                 break;
-            case FileDownloader.ERROR_CONNECTION_TIME_OUT:
+            case Constants.ERROR_CONNECTION_TIME_OUT:
                 message = "Connection Timeout";
                 break;
-            case FileDownloader.ERROR_INVALID_FILE_DESTINATION:
+            case Constants.ERROR_INVALID_FILE_DESTINATION:
                 message = "Invalid File Destination";
                 break;
-            case FileDownloader.ERROR_INVALID_URL:
+            case Constants.ERROR_INVALID_URL:
                 message = "Invalid URL";
                 break;
-            case FileDownloader.ERROR_SERVER_RESPONSE:
+            case Constants.ERROR_SERVER_RESPONSE:
                 message = "Error in Server Response";
                 break;
-            case FileDownloader.ERROR_UNEXPECTED:
+            case Constants.ERROR_UNEXPECTED:
                 message = "Unexpected Error Occurred";
                 break;
             default:
@@ -449,5 +462,22 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         File incompleteDB = new File(Constants.databaseAbsolutePath);
         if (incompleteDB.exists())
             incompleteDB.delete();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    public void onProgressUpdate(String fileType, int progress) {
+        loginProgressBar.setProgress(progress,true);
+        tvProgress.setText(progress + " of 100");
+    }
+
+    @Override
+    public void onResponseSuccess(String api, Object response) {
+
+    }
+
+    @Override
+    public void onResponseFailure(int error) {
+
     }
 }

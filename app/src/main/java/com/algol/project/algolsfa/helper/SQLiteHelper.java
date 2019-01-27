@@ -48,7 +48,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     * authenticate the user locally using username, password and IMEI present in the local database
     * */ {
         SQLiteDatabase db = getReadableDatabase();
-        String query = "Select Password, DeviceIMEI from " + DBRelation.SmanMaster.getAction() + " where UserId= ?";
+        String query = "Select Password, DeviceIMEI from " + DBRelation.SmanMaster.getName() + " where UserId= ?";
         try {
             Cursor resultSet = db.rawQuery(query, new String[]{username});
             if (resultSet.getCount() > 0) {
@@ -77,7 +77,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     * checks whether the database is valid based on the DB Status, Db Validity
     * */ {
         SQLiteDatabase db = getReadableDatabase();
-        String query = "select Module, Value from " + DBRelation.SettingsMaster.getAction() + " where Module in ('DBStatus','DBValidity')";
+        String query = "select Module, Value from " + DBRelation.SettingsMaster.getName() + " where Module in ('DBStatus','DBValidity')";
         try {
             Cursor resultSet = db.rawQuery(query, null);
             if (resultSet.getCount() > 0) {
@@ -86,7 +86,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                     resultSet.moveToNext();
                     String dbValidityPeriod = resultSet.getString(resultSet.getColumnIndex("Value"));
                     resultSet.close();
-                    query = "select case when (((select datetime('now','localtime')) >= (select DBCreationDateTime from " + DBRelation.SmanMaster.getAction() + ")) and ((select datetime('now','localtime')) <= (select datetime((select strftime('%Y-%m-%d 23:59:59',(select DBCreationDateTime from " + DBRelation.SmanMaster.getAction() + "))),'+" + dbValidityPeriod + " day')))) then 'Valid' else 'Invalid' end as Status";
+                    query = "select case when (((select datetime('now','localtime')) >= (select DBCreationDateTime from " + DBRelation.SmanMaster.getName() + ")) and ((select datetime('now','localtime')) <= (select datetime((select strftime('%Y-%m-%d 23:59:59',(select DBCreationDateTime from " + DBRelation.SmanMaster.getName() + "))),'+" + dbValidityPeriod + " day')))) then 'Valid' else 'Invalid' end as Status";
                     resultSet = db.rawQuery(query,null);
                     if (resultSet.getCount() > 0) {
                         resultSet.moveToFirst();
@@ -112,7 +112,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     * */
     {
         SQLiteDatabase db = getReadableDatabase();
-        String query = "select Status from " + DBRelation.PrivilegeMaster.getAction() + " where Module = '" + module + "'";
+        String query = "select Status from " + DBRelation.PrivilegeMaster.getName() + " where Module = '" + module + "'";
         try {
             Cursor resultSet = db.rawQuery(query, null);
             if (resultSet.getCount() > 0) {

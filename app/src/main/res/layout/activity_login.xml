@@ -2,11 +2,11 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/algol_sfa"
-    tools:context="com.algol.project.algolsfa.activities.LoginActivity"
-    android:id="@+id/layout_login">
+    tools:context="com.algol.project.algolsfa.activities.LoginActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/tb_login"
@@ -108,4 +108,12 @@
         android:layout_marginBottom="8dp"
         android:text="Powered by Algol"
         android:textSize="10sp" />
+
+    <include
+        android:id="@+id/layout_progressbar_login"
+        layout="@layout/horizontal_determinate_progressbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
 </RelativeLayout>

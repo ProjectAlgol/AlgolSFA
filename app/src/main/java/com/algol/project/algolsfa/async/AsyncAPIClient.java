@@ -4,17 +4,18 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import com.algol.project.algolsfa.interfaces.APIInvocationListener;
+import com.algol.project.algolsfa.others.Constants;
 import com.algol.project.algolsfa.pojos.APIResponse;
 
 /**
  * Created by Lykos on 27-Jan-19.
  */
 
-public class AsyncAPICaller extends AsyncTask<String, Void, APIResponse> {
+public class AsyncAPIClient extends AsyncTask<String, Void, APIResponse> {
     private Context context;
     private APIInvocationListener apiInvocationListener;
 
-    public AsyncAPICaller(Context context, APIInvocationListener apiInvocationListener) {
+    public AsyncAPIClient(Context context, APIInvocationListener apiInvocationListener) {
         this.context = context;
         this.apiInvocationListener = apiInvocationListener;
     }
@@ -31,6 +32,11 @@ public class AsyncAPICaller extends AsyncTask<String, Void, APIResponse> {
 
     @Override
     protected void onPostExecute(APIResponse apiResponse) {
-        super.onPostExecute(apiResponse);
+        if(apiResponse.getHttpStatus() == Constants.API_SUCCESS) {
+            apiInvocationListener.onResponseSuccess(apiResponse.getApi(),apiResponse.getResponse());
+        }
+        else {
+            apiInvocationListener.onResponseFailure(apiResponse.getHttpStatus());
+        }
     }
 }

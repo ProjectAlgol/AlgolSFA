@@ -19,11 +19,12 @@ public class Constants {
     //public static String databaseURL= "https://mystuffs.000webhostapp.com/SQLite/Shona.JPG";
     public static String testFilePath = null;
     public static String databaseURL = "https://mystuffs.000webhostapp.com/SQLite/algolsfa.db";
+    public static String apiBase= "http://dev.gobizmo.in/Saleslite/SalesliteAX/AXTransactionAPI/API/";
     public static long downloadBufferSize = 10240; // 10 KB
 
-    /* Custom Download-Errors & success codes */
+    /* Custom Errors & success codes for File Download and API calls*/
     public static final int ERROR_INVALID_URL = 0, ERROR_BAD_SERVER = 1, ERROR_BAD_NETWORK = 2, ERROR_UNEXPECTED = 3, ERROR_CONNECTION_TIME_OUT = 4, ERROR_INVALID_FILE_DESTINATION = 5, ERROR_SERVER_RESPONSE = 6;
-    public static final int DOWNLOAD_SUCCESS = 7;
+    public static final int DOWNLOAD_SUCCESS = 7, API_SUCCESS = 8;
 
     // permission codes
     public static final int REQUEST_LOGIN_PERMISSION = 1; // Permissions: Location, External drive read and write

@@ -20,13 +20,16 @@ import android.widget.Toast;
 
 import com.algol.project.algolsfa.R;
 import com.algol.project.algolsfa.adapters.DashboardItemAdapter;
+import com.algol.project.algolsfa.helper.APIClient;
 import com.algol.project.algolsfa.helper.AppUtility;
+import com.algol.project.algolsfa.helper.RESTAPIClient;
 import com.algol.project.algolsfa.helper.SQLiteHelper;
 import com.algol.project.algolsfa.models.DashboardItemModel;
 import com.algol.project.algolsfa.others.Constants;
 import com.algol.project.algolsfa.others.Constants.UserPrivilege;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -373,6 +376,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         String title= ((TextView)view.findViewById(R.id.tv_dashboard_item_title)).getText().toString();
         String message= "Opening " + title;
         Toast.makeText(context,message,Toast.LENGTH_SHORT).show();
+        RESTAPIClient restapiClient= new RESTAPIClient(context, Constants.API.Login,null,"12450");
+        restapiClient.exec();
     }
 
     private void confirmLogout() {
@@ -387,13 +392,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void processLogout(SweetAlertDialog logoutAlert) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences(Constants.LOGIN_CRED_KEY, Context.MODE_PRIVATE);
+        /*SharedPreferences sharedPreferences = context.getSharedPreferences(Constants.LOGIN_CRED_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(getResources().getString(R.string.password), "");
         editor.apply();
         Intent loginIntent = new Intent(context, LoginActivity.class);
         logoutAlert.dismissWithAnimation();
         startActivity(loginIntent);
-        finish();
+        finish();*/
+        HashMap<String,String> request= new HashMap<>();
+        request.put("userid","12450");
+        new APIClient(context,Constants.apiBase + "hndlMyTeam.ashx",null,request).exec();
     }
 }

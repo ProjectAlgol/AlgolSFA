@@ -18,6 +18,7 @@ import android.text.Editable;
 import android.text.Layout;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,6 +40,7 @@ import com.algol.project.algolsfa.interfaces.DownloadListener;
 import com.algol.project.algolsfa.others.Constants;
 import com.algol.project.algolsfa.R;
 import com.algol.project.algolsfa.helper.AppUtility;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -57,6 +59,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private ProgressBar loginProgressBar;
     private TextView tvProgressBarDescription, tvProgress;
     private View layoutLoginProgressBar;
+    private static final String TAG= "LOGIN_LOG";
 
     public static final int LOCALLY_AUTHENTIC = 0, LOCALLY_UNAUTHENTIC = 1, LOCALLY_UNAUTHORIZED = 2, LOCALLY_ANONYMOUS = 3;
 
@@ -86,6 +89,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         loginProgressBar = findViewById(R.id.progressbar);
         tvProgressBarDescription= findViewById(R.id.tv_progress_description);
         tvProgress= findViewById(R.id.tv_progress);
+
+        if(!isFCMTokenAvailable()) {
+            fetchFCMToken();
+        }
 
         etPassword.addTextChangedListener(new TextWatcher() {
             @Override
@@ -126,6 +133,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 toggleLoginButtonActivation();
             }
         });
+
+
     }
 
     @Override
@@ -462,6 +471,23 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         File incompleteDB = new File(Constants.databaseAbsolutePath);
         if (incompleteDB.exists())
             incompleteDB.delete();
+    }
+
+    private boolean isFCMTokenAvailable() {
+        sharedPreferences= context.getSharedPreferences(Constants.FCM_TOKEN_KEY,MODE_PRIVATE);
+        String fcmToken= sharedPreferences.getString(getString(R.string.fcm_token),"");
+        return (fcmToken.length() > 0);
+    }
+
+    private void fetchFCMToken() {
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task -> {
+            if(task.isSuccessful()) {
+                task.getResult().getToken();
+            }
+            else {
+                Log.i(TAG,task.getException().toString());
+            }
+        });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)

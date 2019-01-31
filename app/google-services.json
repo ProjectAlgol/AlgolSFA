@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "484285120992",
+    "firebase_url": "https://algolsfa.firebaseio.com",
+    "project_id": "algolsfa",
+    "storage_bucket": "algolsfa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:484285120992:android:5cf2d762a12f64cf",
+        "android_client_info": {
+          "package_name": "com.algol.project.algolsfa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "484285120992-22jel1n23ivkn1r90fok296spq02qnts.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAckut6Yqd288AYVnznV64ySf2Mc0FoSJI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -13,7 +13,11 @@ import java.io.File;
 
 public class Constants {
     private static final String keyPrefix = BuildConfig.APPLICATION_ID + ".";
+
+    // shared preference keys
     public static final String LOGIN_CRED_KEY = keyPrefix + "LoginCredentials";
+    public static final String FCM_TOKEN_KEY = keyPrefix + "FCMToken";
+
     public static String databaseAbsolutePath = null, databaseFolder = null;
     public static int databaseVersion;
     //public static String databaseURL= "https://mystuffs.000webhostapp.com/SQLite/Shona.JPG";

@@ -8,6 +8,8 @@ import com.algol.project.algolsfa.others.Constants;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.Map;
+
 /**
  * Created by swarnavo.dutta on 1/31/2019.
  */
@@ -31,6 +33,8 @@ public class CustomFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        super.onMessageReceived(remoteMessage);
+        if(remoteMessage != null) {
+            Map<String,String> messageData= remoteMessage.getData();
+        }
     }
 }

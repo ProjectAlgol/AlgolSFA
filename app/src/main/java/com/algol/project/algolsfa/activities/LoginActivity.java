@@ -31,7 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.algol.project.algolsfa.async.AsyncDownloader;
-import com.algol.project.algolsfa.helper.SQLiteHelper;
+import com.algol.project.algolsfa.helper.SecureSQLiteHelper;
 import com.algol.project.algolsfa.interfaces.APIInvocationListener;
 import com.algol.project.algolsfa.interfaces.DownloadListener;
 import com.algol.project.algolsfa.others.Constants;
@@ -51,7 +51,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private Button btnLogin, btnForgotPassword;
     private SharedPreferences sharedPreferences;
     private Context context;
-    private SQLiteHelper dbHelper;
+    private SecureSQLiteHelper dbHelper;
     private String username, password;
     private ProgressBar loginProgressBar;
     private TextView tvProgressBarDescription, tvProgress;
@@ -222,7 +222,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         this.username = etUsername.getText().toString();
         this.password = etPassword.getText().toString();
         if (new File(Constants.databaseAbsolutePath).exists()) {
-            dbHelper = SQLiteHelper.getHelper(context);
+            dbHelper = SecureSQLiteHelper.getHelper(context);
             int localAuthenticationStatus = dbHelper.getLocalAuthenticationStatus(username, password, AppUtility.getDeviceIMEI(context));
             if (localAuthenticationStatus == LOCALLY_AUTHENTIC) {
                 if (dbHelper.isValidDB()) {

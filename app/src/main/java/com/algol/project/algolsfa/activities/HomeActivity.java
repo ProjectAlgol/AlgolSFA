@@ -22,7 +22,7 @@ import com.algol.project.algolsfa.R;
 import com.algol.project.algolsfa.adapters.DashboardItemAdapter;
 import com.algol.project.algolsfa.helper.APIClient;
 import com.algol.project.algolsfa.helper.AppUtility;
-import com.algol.project.algolsfa.helper.SQLiteHelper;
+import com.algol.project.algolsfa.helper.SecureSQLiteHelper;
 import com.algol.project.algolsfa.models.DashboardItemModel;
 import com.algol.project.algolsfa.others.Constants;
 import com.algol.project.algolsfa.others.Constants.UserPrivilege;
@@ -42,7 +42,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private LinearLayout tabOrderAndVisit, tabDelivery, tabAnalytics;
     private Button btnOrderAndVisit, btnDelivery, btnAnalytics;
     private RecyclerView navList;
-    private SQLiteHelper dbHelper;
+    private SecureSQLiteHelper dbHelper;
     private DashboardItemAdapter dashboardItemAdapter;
     private ArrayList<DashboardItemModel> orderAndVisitList, deliveryList, analyticsList;
     private TextView tvNoList;
@@ -52,7 +52,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         context = HomeActivity.this;
-        dbHelper = SQLiteHelper.getHelper(context);
+        dbHelper = SecureSQLiteHelper.getHelper(context);
         commonToolBar = findViewById(R.id.tb_common);
         setSupportActionBar(commonToolBar);
         ActionBar actionBar = getSupportActionBar();

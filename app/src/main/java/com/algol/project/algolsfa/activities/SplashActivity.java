@@ -11,7 +11,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 
 import com.algol.project.algolsfa.helper.AppUtility;
-import com.algol.project.algolsfa.helper.SQLiteHelper;
+import com.algol.project.algolsfa.helper.SecureSQLiteHelper;
 import com.algol.project.algolsfa.others.Constants;
 import com.algol.project.algolsfa.R;
 
@@ -44,7 +44,7 @@ public class SplashActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = context.getSharedPreferences(Constants.LOGIN_CRED_KEY, Context.MODE_PRIVATE);
         if (sharedPreferences.getString(getResources().getString(R.string.password), "").length() > 0) {
             if (new File(Constants.databaseAbsolutePath).exists()) {
-                SQLiteHelper dbHelper = SQLiteHelper.getHelper(context);
+                SecureSQLiteHelper dbHelper = SecureSQLiteHelper.getHelper(context);
                 int localAuthenticationStatus = dbHelper.getLocalAuthenticationStatus(sharedPreferences.getString(getResources().getString(R.string.username), ""), sharedPreferences.getString(getResources().getString(R.string.password), ""), AppUtility.getDeviceIMEI(context));
                 if (localAuthenticationStatus == LoginActivity.LOCALLY_AUTHENTIC) {
                     if (dbHelper.isValidDB()) {

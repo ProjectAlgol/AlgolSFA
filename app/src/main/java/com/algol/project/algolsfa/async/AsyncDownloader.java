@@ -12,7 +12,6 @@ import android.support.annotation.RequiresApi;
 import com.algol.project.algolsfa.helper.FileDownloader;
 import com.algol.project.algolsfa.interfaces.DownloadListener;
 
-import com.algol.project.algolsfa.interfaces.ProgressListener;
 import com.algol.project.algolsfa.others.Constants;
 import com.algol.project.algolsfa.pojos.DownloadStatus;
 
@@ -21,7 +20,7 @@ import com.algol.project.algolsfa.pojos.DownloadStatus;
  * Created by swarnavo.dutta on 1/25/2019.
  */
 
-public class AsyncDownloader extends AsyncTask<String, Integer, DownloadStatus> implements ProgressListener {
+public class AsyncDownloader extends AsyncTask<String, Integer, DownloadStatus> {
     private Context context;
     private DownloadListener downloadListener;
     private String fileType;
@@ -43,7 +42,7 @@ public class AsyncDownloader extends AsyncTask<String, Integer, DownloadStatus> 
     /*
     * downloads the find in background thread
     * */ {
-        FileDownloader fileDownloader = new FileDownloader(context, fileType,this);
+        FileDownloader fileDownloader = new FileDownloader(context, fileType, this::publishProgress);
         return fileDownloader.download(params[0], params[1]); // Download URL, File Destination
     }
 
@@ -63,10 +62,5 @@ public class AsyncDownloader extends AsyncTask<String, Integer, DownloadStatus> 
             downloadListener.onDownloadComplete(downloadStatus.getFileType());
         else
             downloadListener.onDownloadFailed(downloadStatus.getFileType(), downloadStatus.getStatus());
-    }
-
-    @Override
-    public void onProgress(int progress) {
-        publishProgress(progress);
     }
 }

@@ -28,7 +28,6 @@ public class CustomFirebaseMessagingService extends FirebaseMessagingService {
         else {
             Log.i(TAG,"Failed to fetch FCM token");
         }
-
     }
 
     @Override

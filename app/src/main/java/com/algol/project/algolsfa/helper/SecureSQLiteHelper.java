@@ -1,9 +1,13 @@
+/*
+* SecureSQLiteHelper is a singleton class responsible to manage and handle the database calls from encrypted SQLite database. In other words, it helps to read from and write into the encrypted database.
+* */
 package com.algol.project.algolsfa.helper;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
+import com.algol.project.algolsfa.R;
 import com.algol.project.algolsfa.activities.LoginActivity;
 import com.algol.project.algolsfa.others.Constants;
 
@@ -20,10 +24,12 @@ public class SecureSQLiteHelper extends SQLiteOpenHelper {
     private static SecureSQLiteHelper dbHelper = null;
     public static final String TAG= "EncTest";
     private Context context;
+    private String encryptionKey;
 
     private SecureSQLiteHelper(Context context, String name, int version) {
         super(context, name, null, version);
         this.context= context;
+        encryptionKey= context.getResources().getString(R.string.encryption_key);
     }
 
     public static SecureSQLiteHelper getHelper(Context context)
@@ -34,6 +40,17 @@ public class SecureSQLiteHelper extends SQLiteOpenHelper {
             dbHelper = new SecureSQLiteHelper(context, Constants.databaseAbsolutePath, Constants.databaseVersion);
         }
         return dbHelper;
+    }
+
+    public static void encryptDatabase(Context context) {
+        SQLiteDatabase.loadLibs(context);
+        SQLiteDatabase db= (new SecureSQLiteHelper(context, Constants.unencryptedDBAbsolutePath, Constants.databaseVersion)).getWritableDatabase("");
+        //SQLiteDatabase.openOrCreateDatabase((new File(Constants.databaseAbsolutePath)).getAbsolutePath(),encryptionKey,null);
+        db.rawExecSQL("ATTACH DATABASE '" + (new File(Constants.databaseAbsolutePath)).getAbsolutePath() + "' AS encrypted KEY '" + context.getResources().getString(R.string.encryption_key) + "'");
+        db.rawExecSQL("SELECT sqlcipher_export('encrypted')");
+        db.rawExecSQL("DETACH DATABASE encrypted");
+        db.close();
+        new File(Constants.unencryptedDBAbsolutePath).delete();
     }
 
     @Override
@@ -53,8 +70,7 @@ public class SecureSQLiteHelper extends SQLiteOpenHelper {
     /*
     * authenticate the user locally using username, password and IMEI present in the local database
     * */ {
-        SQLiteDatabase.loadLibs(context);
-        SQLiteDatabase db= SQLiteDatabase.openOrCreateDatabase(new File(Constants.databaseAbsolutePath),"Hola Oso",null);
+        SQLiteDatabase db= getReadableDatabase(encryptionKey);
         String query = "Select Password, DeviceIMEI from " + Constants.DBRelation.SmanMaster.getName() + " where UserId= ?";
         try {
             Cursor resultSet = db.rawQuery(query, new String[]{username});
@@ -69,7 +85,6 @@ public class SecureSQLiteHelper extends SQLiteOpenHelper {
                     return LoginActivity.LOCALLY_UNAUTHORIZED;
                 else
                     return LoginActivity.LOCALLY_UNAUTHENTIC;
-
             } else {
                 return LoginActivity.LOCALLY_ANONYMOUS;
             }
@@ -83,8 +98,7 @@ public class SecureSQLiteHelper extends SQLiteOpenHelper {
     /*
     * checks whether the database is valid based on the DB Status, Db Validity
     * */ {
-        SQLiteDatabase.loadLibs(context);
-        SQLiteDatabase db= SQLiteDatabase.openOrCreateDatabase(new File(Constants.databaseAbsolutePath),"Hola Oso",null);
+        SQLiteDatabase db= getReadableDatabase(encryptionKey);
         String query = "select Module, Value from " + Constants.DBRelation.SettingsMaster.getName() + " where Module in ('DBStatus','DBValidity')";
         try {
             Cursor resultSet = db.rawQuery(query, null);
@@ -119,8 +133,7 @@ public class SecureSQLiteHelper extends SQLiteOpenHelper {
     * checks whether the user has privilege for the provided module
     * */
     {
-        SQLiteDatabase.loadLibs(context);
-        SQLiteDatabase db= SQLiteDatabase.openOrCreateDatabase(new File(Constants.databaseAbsolutePath),"Hola Oso",null);
+        SQLiteDatabase db= getReadableDatabase(encryptionKey);
         String query = "select Status from " + Constants.DBRelation.PrivilegeMaster.getName() + " where Module = '" + module + "'";
         try {
             Cursor resultSet = db.rawQuery(query, null);

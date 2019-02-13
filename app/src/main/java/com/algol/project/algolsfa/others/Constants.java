@@ -18,7 +18,7 @@ public class Constants {
     public static final String LOGIN_CRED_KEY = keyPrefix + "LoginCredentials";
     public static final String FCM_TOKEN_KEY = keyPrefix + "FCMToken";
 
-    public static String databaseAbsolutePath = null, databaseFolder = null;
+    public static String databaseAbsolutePath = null, unencryptedDBAbsolutePath= null, databaseFolder = null;
     public static int databaseVersion;
     //public static String databaseURL= "https://mystuffs.000webhostapp.com/SQLite/Shona.JPG";
     public static String testFilePath = null;
@@ -99,6 +99,7 @@ public class Constants {
     * */ {
         databaseFolder = android.os.Environment.getExternalStorageDirectory() + File.separator + context.getResources().getString(R.string.database_dir) + File.separator;
         databaseAbsolutePath = databaseFolder + context.getResources().getString(R.string.database_name);
+        unencryptedDBAbsolutePath= databaseFolder + "vulnerable_db.db";
         databaseVersion = context.getResources().getInteger(R.integer.database_version);
         testFilePath = android.os.Environment.getExternalStorageDirectory() + File.separator + context.getResources().getString(R.string.database_dir) + File.separator + "Shona.jpg";
     }

@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.algol.project.algolsfa.async.AsyncDownloader;
+import com.algol.project.algolsfa.helper.SQLiteHelper;
 import com.algol.project.algolsfa.helper.SecureSQLiteHelper;
 import com.algol.project.algolsfa.interfaces.APIInvocationListener;
 import com.algol.project.algolsfa.interfaces.DownloadListener;
@@ -313,7 +314,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         tvProgressBarDescription.setText(getResources().getString(R.string.downloading_db));
         loginProgressBar.setVisibility(View.VISIBLE);
         tvProgress.setVisibility(View.VISIBLE);
-        asyncDownloader.execute(Constants.databaseURL,Constants.databaseAbsolutePath);
+        asyncDownloader.execute(Constants.databaseURL,Constants.unencryptedDBAbsolutePath);
     }
 
     private void login() {

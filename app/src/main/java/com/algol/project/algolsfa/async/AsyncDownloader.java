@@ -10,6 +10,7 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 
 import com.algol.project.algolsfa.helper.FileDownloader;
+import com.algol.project.algolsfa.helper.SecureSQLiteHelper;
 import com.algol.project.algolsfa.interfaces.DownloadListener;
 
 import com.algol.project.algolsfa.others.Constants;
@@ -58,9 +59,13 @@ public class AsyncDownloader extends AsyncTask<String, Integer, DownloadStatus> 
     * Based on the download completion status (Failed or succeeded), it invokes the callback methods in the UI thread.
     * On Download failed, the error is also passed to the callback.
     * */ {
-        if (downloadStatus.getStatus() == Constants.DOWNLOAD_SUCCESS)
+        if (downloadStatus.getStatus() == Constants.DOWNLOAD_SUCCESS) {
+            if(downloadStatus.getFileType().equalsIgnoreCase(Constants.FILE_DB))
+                SecureSQLiteHelper.encryptDatabase(context);
             downloadListener.onDownloadComplete(downloadStatus.getFileType());
-        else
+        }
+        else {
             downloadListener.onDownloadFailed(downloadStatus.getFileType(), downloadStatus.getStatus());
+        }
     }
 }

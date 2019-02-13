@@ -28,7 +28,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     * provides SQLiteHelper instance
     * */ {
         if (dbHelper == null) {
-            dbHelper = new SQLiteHelper(context, Constants.databaseAbsolutePath, Constants.databaseVersion);
+            dbHelper = new SQLiteHelper(context, Constants.unencryptedDBAbsolutePath, Constants.databaseVersion);
         }
         return dbHelper;
     }

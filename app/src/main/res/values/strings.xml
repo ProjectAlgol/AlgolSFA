@@ -9,6 +9,7 @@
     <string name="database_name">algolsfa.db</string>
     <string name="database_version">1.0.0.0</string>
     <string name="fcm_token">FCMToken</string>
+    <string name="encryption_key">holaoso</string>
 
     <!-- alert messages -->
     <string name="logout_alert">Are you sure you wanna logout?</string>

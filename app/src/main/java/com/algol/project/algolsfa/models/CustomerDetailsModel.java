@@ -5,7 +5,7 @@ package com.algol.project.algolsfa.models;
  */
 
 public class CustomerDetailsModel {
-    private String customerCode, customerName, address, city, pin, contactNo, rateCode, routeCode, distCode, distGroup, cashStatus, gstStatus, gstNumber, aadharNo, latitude, longitude;
+    private String customerCode, customerName, address, city, pin, contactNo, channel, tinNo, rateCode, routeCode, distCode, discountGroup, cashStatus, gstStatus, gstNo, aadharNo, latitude, longitude;
 
     public String getCustomerCode() {
         return customerCode;
@@ -55,6 +55,22 @@ public class CustomerDetailsModel {
         this.contactNo = contactNo;
     }
 
+    public String getChannel() {
+        return channel;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
+    }
+
+    public String getTinNo() {
+        return tinNo;
+    }
+
+    public void setTinNo(String tinNo) {
+        this.tinNo = tinNo;
+    }
+
     public String getRateCode() {
         return rateCode;
     }
@@ -79,12 +95,12 @@ public class CustomerDetailsModel {
         this.distCode = distCode;
     }
 
-    public String getDistGroup() {
-        return distGroup;
+    public String getDiscountGroup() {
+        return discountGroup;
     }
 
-    public void setDistGroup(String distGroup) {
-        this.distGroup = distGroup;
+    public void setDiscountGroup(String discountGroup) {
+        this.discountGroup = discountGroup;
     }
 
     public String getCashStatus() {
@@ -103,12 +119,12 @@ public class CustomerDetailsModel {
         this.gstStatus = gstStatus;
     }
 
-    public String getGstNumber() {
-        return gstNumber;
+    public String getGstNo() {
+        return gstNo;
     }
 
-    public void setGstNumber(String gstNumber) {
-        this.gstNumber = gstNumber;
+    public void setGstNo(String gstNo) {
+        this.gstNo = gstNo;
     }
 
     public String getAadharNo() {

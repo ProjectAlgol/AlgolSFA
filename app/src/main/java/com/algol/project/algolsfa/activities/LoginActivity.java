@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
@@ -306,10 +307,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         loginProgressBar.setVisibility(View.GONE);
         tvProgress.setVisibility(View.GONE);
         layoutLoginProgressBar.setVisibility(View.VISIBLE);
+        getWindow().setFlags(LayoutParams.FLAG_NOT_TOUCHABLE,LayoutParams.FLAG_NOT_TOUCHABLE);
 
         File dbFolder = new File(Constants.databaseFolder);
-        if (!dbFolder.exists())
+        if (!dbFolder.exists()) {
             dbFolder.mkdir();
+        }
+        else {
+            File oldEncryptedDB= new File(Constants.databaseAbsolutePath);
+            if(oldEncryptedDB.exists())
+                oldEncryptedDB.delete();
+        }
+
         AsyncDownloader asyncDownloader= new AsyncDownloader(context,Constants.FILE_DB,this);
         tvProgressBarDescription.setText(getResources().getString(R.string.downloading_db));
         loginProgressBar.setVisibility(View.VISIBLE);
@@ -429,7 +438,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     * */
     {
         layoutLoginProgressBar.setVisibility(View.GONE);
-
+        getWindow().clearFlags(LayoutParams.FLAG_NOT_TOUCHABLE);
     }
 
     @Override

@@ -148,17 +148,35 @@ public class SecureSQLiteHelper extends SQLiteOpenHelper {
         }
     }
 
-    public ArrayList<CustomerDetailsModel> getPlannedCustomers() {
+    public ArrayList<CustomerDetailsModel> getOutlets(String type) {
         CustomerDetailsModel customerDetails;
         ArrayList<CustomerDetailsModel> plannedCustomerList= new ArrayList<>();
         SQLiteDatabase db= getReadableDatabase(encryptionKey);
-        String query= "select CustomerCode, CustomerName, Address1 as Address, City, PIN, Latitude, Longitude, ContactNo, RouteCode, Channel, TinNo, RateCode, DistCode, DiscGroup, CashStatus, GSTStatus, GSTNo, AadharNo from CustomerMaster where PJPStatus= 'Yes'";
+        String query= "select CustomerCode, CustomerName, Address1 as Address, City, PIN, Latitude, Longitude, ifnull(ContactNo,'') as ContactNo, RouteCode, ifnull(Channel,'') as Channel, ifnull(TinNo,'') as TinNo, RateCode, ifnull(DistCode,'') as DistCode, ifnull(DiscGroup,'') as DiscountGroup, CashStatus, GSTStatus, ifnull(GSTNo,'') as GSTNo, ifnull(AadharNo,'') as AadharNo from CustomerMaster where PJPStatus= '" + ((type.equalsIgnoreCase("Planned"))? "Yes" : "No")+ "'";
         try{
             Cursor resultSet= db.rawQuery(query,null);
             if(resultSet.getCount() > 0) {
                 resultSet.moveToFirst();
                 do {
                     customerDetails= new CustomerDetailsModel();
+                    customerDetails.setCustomerCode(resultSet.getString(resultSet.getColumnIndex("CustomerCode")));
+                    customerDetails.setCustomerName(resultSet.getString(resultSet.getColumnIndex("CustomerName")));
+                    customerDetails.setAddress(resultSet.getString(resultSet.getColumnIndex("Address")));
+                    customerDetails.setCity(resultSet.getString(resultSet.getColumnIndex("City")));
+                    customerDetails.setPin(resultSet.getString(resultSet.getColumnIndex("PIN")));
+                    customerDetails.setLatitude(resultSet.getString(resultSet.getColumnIndex("Latitude")));
+                    customerDetails.setLongitude(resultSet.getString(resultSet.getColumnIndex("Longitude")));
+                    customerDetails.setContactNo(resultSet.getString(resultSet.getColumnIndex("ContactNo")));
+                    customerDetails.setRouteCode(resultSet.getString(resultSet.getColumnIndex("RouteCode")));
+                    customerDetails.setChannel(resultSet.getString(resultSet.getColumnIndex("Channel")));
+                    customerDetails.setTinNo(resultSet.getString(resultSet.getColumnIndex("TinNo")));
+                    customerDetails.setRateCode(resultSet.getString(resultSet.getColumnIndex("RateCode")));
+                    customerDetails.setDistCode(resultSet.getString(resultSet.getColumnIndex("DistCode")));
+                    customerDetails.setDiscountGroup(resultSet.getString(resultSet.getColumnIndex("DiscountGroup")));
+                    customerDetails.setCashStatus(resultSet.getString(resultSet.getColumnIndex("CashStatus")));
+                    customerDetails.setGstStatus(resultSet.getString(resultSet.getColumnIndex("GSTStatus")));
+                    customerDetails.setGstNo(resultSet.getString(resultSet.getColumnIndex("GSTNo")));
+                    customerDetails.setAadharNo(resultSet.getString(resultSet.getColumnIndex("AadharNo")));
                     plannedCustomerList.add(customerDetails);
                 }
                 while(resultSet.moveToNext());

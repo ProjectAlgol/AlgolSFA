@@ -7,8 +7,6 @@ import com.algol.project.algolsfa.interfaces.APIInvocationListener;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -36,9 +34,11 @@ public class APIClient {
         RequestQueue requestQueue= Volley.newRequestQueue(context);
         StringRequest stringRequest= new StringRequest(Request.Method.GET, apiURL, response -> {
             Log.v("Test",response);
+            //apiInvocationListener.onResponseSuccess(apiURL,response);
         }, error -> {
             Log.v("Test","Error");
-        }){
+            //apiInvocationListener.onResponseFailure(Constants.ERROR_SERVER_RESPONSE);
+        }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 return request;

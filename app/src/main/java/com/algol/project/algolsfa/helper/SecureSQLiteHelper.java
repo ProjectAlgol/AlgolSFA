@@ -5,7 +5,6 @@ package com.algol.project.algolsfa.helper;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
 
 import com.algol.project.algolsfa.R;
 import com.algol.project.algolsfa.activities.LoginActivity;
@@ -37,16 +36,20 @@ public class SecureSQLiteHelper extends SQLiteOpenHelper {
     * provides SQLiteHelper instance
     * */ {
         if (dbHelper == null) {
+            SQLiteDatabase.loadLibs(context);
             dbHelper = new SecureSQLiteHelper(context, Constants.databaseAbsolutePath, Constants.databaseVersion);
         }
         return dbHelper;
     }
 
-    public static void encryptDatabase(Context context) {
+    public static void encryptDatabase(Context context, String encryptionKey)
+    /*
+    * Encrypts the database using the given key.
+             -- it creates a blank encrypted database using the given encryptionKey and attaches it to the unencrypted database. Later it transfers the data from unencrypted database to the encrypted one and deletes the unencrypted database at the end.
+    * */ {
         SQLiteDatabase.loadLibs(context);
-        SQLiteDatabase db= (new SecureSQLiteHelper(context, Constants.unencryptedDBAbsolutePath, Constants.databaseVersion)).getWritableDatabase("");
-        //SQLiteDatabase.openOrCreateDatabase((new File(Constants.databaseAbsolutePath)).getAbsolutePath(),encryptionKey,null);
-        db.rawExecSQL("ATTACH DATABASE '" + (new File(Constants.databaseAbsolutePath)).getAbsolutePath() + "' AS encrypted KEY '" + context.getResources().getString(R.string.encryption_key) + "'");
+        SQLiteDatabase db= (new SecureSQLiteHelper(context, (new File(Constants.unencryptedDBAbsolutePath)).getAbsolutePath(), Constants.databaseVersion)).getWritableDatabase("");
+        db.rawExecSQL("ATTACH DATABASE '" + (new File(Constants.databaseAbsolutePath)).getAbsolutePath() + "' AS encrypted KEY '" + encryptionKey + "'");
         db.rawExecSQL("SELECT sqlcipher_export('encrypted')");
         db.rawExecSQL("DETACH DATABASE encrypted");
         db.close();
@@ -55,15 +58,10 @@ public class SecureSQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        if(db.isOpen())
-            Log.i(TAG,"Opened");
-        else
-            Log.i(TAG,"Not Opened");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
     }
 
     public int getLocalAuthenticationStatus(String username, String password, String deviceIMEI)
@@ -131,8 +129,7 @@ public class SecureSQLiteHelper extends SQLiteOpenHelper {
     public boolean isPrivileged(String module)
     /*
     * checks whether the user has privilege for the provided module
-    * */
-    {
+    * */ {
         SQLiteDatabase db= getReadableDatabase(encryptionKey);
         String query = "select Status from " + Constants.DBRelation.PrivilegeMaster.getName() + " where Module = '" + module + "'";
         try {

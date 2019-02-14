@@ -43,7 +43,7 @@
             android:layout_below="@+id/progressbar"
             android:layout_centerHorizontal="true"
             android:gravity="center"
-            android:text="0 of 100"
+            android:text=""
             android:textSize="12sp"
             android:textColor="@color/matte_light_black"/>
     </RelativeLayout>

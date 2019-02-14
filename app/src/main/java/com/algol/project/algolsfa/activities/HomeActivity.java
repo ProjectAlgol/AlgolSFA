@@ -56,7 +56,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         commonToolBar = findViewById(R.id.tb_common);
         setSupportActionBar(commonToolBar);
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setDisplayUseLogoEnabled(true);
         actionBar.setDisplayShowTitleEnabled(true);
         btnOrderAndVisit = findViewById(R.id.btn_order_visit);
@@ -125,7 +124,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.common_toolbar_menu, menu);
+        getMenuInflater().inflate(R.menu.home_toolbar_menu, menu);
         return true;
     }
 
@@ -373,11 +372,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     public void onDashboardListItemClick(View view) {
         String title= ((TextView)view.findViewById(R.id.tv_dashboard_item_title)).getText().toString();
-        String message= "Opening " + title;
-        Toast.makeText(context,message,Toast.LENGTH_SHORT).show();
-        HashMap<String,String> request= new HashMap<>();
-        request.put("userid","12450");
-        new APIClient(context,Constants.apiBase + "hndlMyTeam.ashx",null,request).exec();
+        if(title.equalsIgnoreCase(getResources().getString(R.string.planned_visit))) {
+            startActivity(new Intent(context,PlannedActivity.class));
+        }
+        else {
+            String message= "Opening " + title;
+            Toast.makeText(context,message,Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void confirmLogout() {

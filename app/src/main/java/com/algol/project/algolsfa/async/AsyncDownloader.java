@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 
+import com.algol.project.algolsfa.R;
 import com.algol.project.algolsfa.helper.FileDownloader;
 import com.algol.project.algolsfa.helper.SecureSQLiteHelper;
 import com.algol.project.algolsfa.interfaces.DownloadListener;
@@ -61,7 +62,7 @@ public class AsyncDownloader extends AsyncTask<String, Integer, DownloadStatus> 
     * */ {
         if (downloadStatus.getStatus() == Constants.DOWNLOAD_SUCCESS) {
             if(downloadStatus.getFileType().equalsIgnoreCase(Constants.FILE_DB))
-                SecureSQLiteHelper.encryptDatabase(context);
+                SecureSQLiteHelper.encryptDatabase(context, context.getResources().getString(R.string.encryption_key));
             downloadListener.onDownloadComplete(downloadStatus.getFileType());
         }
         else {

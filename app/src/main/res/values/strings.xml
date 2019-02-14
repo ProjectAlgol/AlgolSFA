@@ -24,6 +24,7 @@
 
     <!-- vacant message -->
     <string name="no_dashboard_list">No service is allocated to you</string>
+    <string name="no_planned_list">No planned outlets are found</string>
 
     <!-- dashboard item title -->
     <string name="planned_visit">Planned Visit</string>

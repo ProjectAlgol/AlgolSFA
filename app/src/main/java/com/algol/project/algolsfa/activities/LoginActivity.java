@@ -313,6 +313,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         AsyncDownloader asyncDownloader= new AsyncDownloader(context,Constants.FILE_DB,this);
         tvProgressBarDescription.setText(getResources().getString(R.string.downloading_db));
         loginProgressBar.setVisibility(View.VISIBLE);
+        tvProgress.setText("");
         tvProgress.setVisibility(View.VISIBLE);
         asyncDownloader.execute(Constants.databaseURL,Constants.unencryptedDBAbsolutePath);
     }

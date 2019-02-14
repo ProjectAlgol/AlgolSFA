@@ -8,12 +8,14 @@ import android.database.Cursor;
 
 import com.algol.project.algolsfa.R;
 import com.algol.project.algolsfa.activities.LoginActivity;
+import com.algol.project.algolsfa.models.CustomerDetailsModel;
 import com.algol.project.algolsfa.others.Constants;
 
 import net.sqlcipher.database.SQLiteDatabase;
 import net.sqlcipher.database.SQLiteOpenHelper;
 
 import java.io.File;
+import java.util.ArrayList;
 
 /**
  * Created by swarnavo.dutta on 2/12/2019.
@@ -144,5 +146,27 @@ public class SecureSQLiteHelper extends SQLiteOpenHelper {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public ArrayList<CustomerDetailsModel> getPlannedCustomers() {
+        CustomerDetailsModel customerDetails;
+        ArrayList<CustomerDetailsModel> plannedCustomerList= new ArrayList<>();
+        SQLiteDatabase db= getReadableDatabase(encryptionKey);
+        String query= "select CustomerCode, CustomerName, Address1 as Address, City, PIN, Latitude, Longitude, ContactNo, RouteCode, Channel, TinNo, RateCode, DistCode, DiscGroup, CashStatus, GSTStatus, GSTNo, AadharNo from CustomerMaster where PJPStatus= 'Yes'";
+        try{
+            Cursor resultSet= db.rawQuery(query,null);
+            if(resultSet.getCount() > 0) {
+                resultSet.moveToFirst();
+                do {
+                    customerDetails= new CustomerDetailsModel();
+                    plannedCustomerList.add(customerDetails);
+                }
+                while(resultSet.moveToNext());
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return plannedCustomerList;
     }
 }

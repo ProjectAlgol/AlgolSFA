@@ -14,17 +14,18 @@ import android.widget.FrameLayout;
 
 import com.algol.project.algolsfa.R;
 import com.algol.project.algolsfa.fragments.OutletListFragment;
+import com.algol.project.algolsfa.interfaces.PlannedUnplannedFragmentCommunicator;
 import com.algol.project.algolsfa.models.CustomerDetailsModel;
 
 /**
  * Created by swarnavo.dutta on 2/14/2019.
  */
 
-public class PlannedActivity extends AppCompatActivity {
+public class PlannedActivity extends AppCompatActivity implements PlannedUnplannedFragmentCommunicator {
     private CustomerDetailsModel selectedCustomer;
     private Toolbar commonToolbar;
     private FrameLayout plannedFragmentHolder;
-    public ActionBar actionBar;
+    private ActionBar actionBar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,5 +64,10 @@ public class PlannedActivity extends AppCompatActivity {
         transaction.add(R.id.planned_fragments_holder, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+    @Override
+    public void setTitle(String title) {
+        actionBar.setTitle(title);
     }
 }

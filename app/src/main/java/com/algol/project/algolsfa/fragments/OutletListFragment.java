@@ -10,8 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.algol.project.algolsfa.R;
-import com.algol.project.algolsfa.activities.PlannedActivity;
 import com.algol.project.algolsfa.helper.SecureSQLiteHelper;
+import com.algol.project.algolsfa.interfaces.PlannedUnplannedFragmentCommunicator;
 import com.algol.project.algolsfa.models.CustomerDetailsModel;
 
 import java.util.ArrayList;
@@ -24,20 +24,27 @@ public class OutletListFragment extends Fragment {
     private Context context;
     private SecureSQLiteHelper dbHelper;
     private ArrayList<CustomerDetailsModel> outlets;
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view= inflater.inflate(R.layout.fragment_outlet_list,container,false);
-        dbHelper= SecureSQLiteHelper.getHelper(context);
-        outlets= dbHelper.getOutlets("Planned");
-        return view;
-    }
+    private String parentName;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context= context;
-        ((PlannedActivity)context).actionBar.setTitle(context.getResources().getString(R.string.planned_visit));
+        parentName= context.getClass().getSimpleName();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ((PlannedUnplannedFragmentCommunicator)context).setTitle((parentName.equalsIgnoreCase("PlannedActivity"))? context.getResources().getString(R.string.planned_visit) : context.getResources().getString(R.string.unplanned_visit));
+        dbHelper= SecureSQLiteHelper.getHelper(context);
+        outlets= dbHelper.getOutlets((parentName.equalsIgnoreCase("PlannedActivity"))? "Planned" : "Unplanned");
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view= inflater.inflate(R.layout.fragment_outlet_list,container,false);
+        return view;
     }
 }
